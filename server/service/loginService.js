@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import bcrypt from "bcryptjs";
+=======
+const bcrypt = require('bcryptjs')
+>>>>>>> duc
 let checkEmail = (email) => {
     return new Promise(async (resolve, reject) => {
         try {
