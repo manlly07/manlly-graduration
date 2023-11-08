@@ -4,7 +4,7 @@ const cors = require('cors');
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const port = process.env.PORT || 5000;
-const routers = require("./routes/route")
+const routers = require("./routes")
 const connectDB = require('./config/database');
 
 
@@ -28,7 +28,19 @@ app.use(
 //     console.log(err);
 //   });
 
-app.use("/api/", routers);
+app.use(routers);
+
+// error handling
+app.use(function(err, req, res, next){
+
+  const message = err.raw?.message || err.message || err.sqlMessage || null;
+
+  console.error(err);
+  log.create({ message: message, body: err, req: req });
+  
+  return res.status(500).send({ message: message });
+
+});
 
 const server = app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
