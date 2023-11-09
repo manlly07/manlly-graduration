@@ -12,9 +12,11 @@ const ProjectSchema = new Schema({
 const Project = mongoose.model('Project', ProjectSchema, 'projects')
 exports.schema = Project
 
-exports.create = async function(project){
+exports.create = async function(userId, project){
     const data = {
-        projectName: project.name,
+        projectName: project.projectName,
+        userId: userId,
+        description: project.description,
         date_created: new Date()
     }
     const newProject = Project(data)
