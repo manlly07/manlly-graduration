@@ -8,7 +8,8 @@ const UserSchema = new Schema({
   phoneNumber: { type: String },
   DOB: { type: Date },
   address: {type: String},
-  role: { type: Number, enum: [0, 1, 2], default: 0}
+  role: { type: Number, enum: [0, 1, 2], default: 0},
+  date_created: Date
 }); 
 
 const User = mongoose.model('User', UserSchema, 'users');
