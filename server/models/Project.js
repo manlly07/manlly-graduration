@@ -27,7 +27,7 @@ exports.create = async function(userId, project){
 exports.get = async function(userId, projectId){
     const projects = await Project.find({userId: userId})
     if (projectId){
-        const project = projects.filter((item) => item._id === projectId)
+        const project = projects.filter((item) => item._id == projectId)
         return project
     }
     return projects
