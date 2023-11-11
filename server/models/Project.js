@@ -34,26 +34,21 @@ exports.get = async function(userId, projectId){
 }
 
 exports.update = async function(projecyId,data){
-    const result = await Project.findByIdAndUpdate(projecyId, data, (err, docs) => {
-        if(err) {
-            console.log("Error in updating data")
-            throw err;
-        } else{
-            console.log(docs);
-        }
-    })
-    return result
+    try{
+        const project = await Project.findByIdAndUpdate(projecyId, data)
+        const result = Project.findById(project._id)
+        return result
+    }catch(err){
+        return err
+    }
 }
 
 exports.delete = async function(projectId){
-    const result =  await Project.remove({ _id : projectId }, (err)=>{
-        if(err) {
-            console.log("Error in deleting data");
-            throw err;
-        }else{
-            console.log('Successfully');
-        }
-    })
-    return result
+    try{
+        const result = await Project.findByIdAndDelete(projectId)
+        return result
+    }catch(err){
+        return err
+    }
 }
 

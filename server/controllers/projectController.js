@@ -38,3 +38,27 @@ exports.getProject = async function(req, res){
     }
     return res.status(200).json(project)
 }
+
+exports.updateProject = async function(req, res){
+    const projectId = req.params.projectId
+    const data = req.body
+    try{
+        const result = await projectModel.update(projectId, data)
+        return res.status(200).json(result)
+    }catch(err){
+        return res.status(404).json({msg: 'error', data: err})
+    }
+}
+
+exports.deleteProject = async function(req, res){
+    const projectId = req.params.projectId
+    try{
+        const result = await projectModel.delete(projectId)
+        if(result === null){
+        return res.status(404).json({msg: 'error', data: result})
+        }
+        return res.status(200).json({msg: 'success', data: result})
+    }catch(err){
+        return res.status(404).json({msg: 'error', data: err})
+    }
+}

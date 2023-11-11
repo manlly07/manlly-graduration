@@ -9,5 +9,9 @@ api.get('/api/project/:userId', use(projectController.listProject))
 
 api.get('/api/project/:userId/:projectId', use(projectController.getProject))
 
+api.put('/api/project/:projectId', use(projectController.updateProject))
+
+api.delete('/api/project/:projectId', use(projectController.deleteProject))
+
 
 module.exports = api
