@@ -1,8 +1,9 @@
 const bcrypt = require('bcryptjs')
+const User = require('../models/User')
 let checkEmail = (email) => {
     return new Promise(async (resolve, reject) => {
         try {
-            let user = await db.User.findOne({
+            let user = await User.findOne({
                 where: { username: uname }
             })
             if (user) {
@@ -22,7 +23,7 @@ let handleLogin = (email, password) => {
             let result = {};
             let checkEmailExist = await checkEmail(email);
             if(checkEmailExist) {
-                let user = await db.User.findOne({
+                let user = await User.findOne({
                     attributes: ["id", "email", "password", "name", "phoneNumber", "DOB", "address", "role"],
                     where: { username: username },
                     raw: true
