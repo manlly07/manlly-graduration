@@ -10,3 +10,24 @@ const MarkSchema = new Schema({
 
 const Mark = mongoose.model('Mark', MarkSchema, 'marks')
 exports.schema = Mark
+
+exports.create = async function(teacherId,mark){
+    const data = {
+        mark: mark.mark,
+        type: mark.type,
+        teacherId: teacherId,
+        date_created: new Date()
+    }
+    const newMark = Mark(data)
+    await newMark.save()
+    return newMark
+} 
+
+exports.get = async function(markId){
+    try{
+        const mark = await Mark.findById(markId)
+        return mark
+    }catch(err){
+        return err
+    }
+}

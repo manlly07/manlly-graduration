@@ -52,3 +52,15 @@ exports.delete = async function(projectId){
     }
 }
 
+exports.addMark = async function(projectId, markId){
+    try{
+        const project = await Project.findById(projectId)
+        project.listMark.push(markId)
+        project.markModified('listMark')
+        await project.save()
+        return project
+    }catch(err){
+        return err
+    }
+}
+

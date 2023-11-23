@@ -6,7 +6,6 @@ const port = process.env.PORT || 5000;
 const routers = require("./routes")
 const connectDB = require('./config/database');
 
-connectDB();
 
 dotenv.config();
 app.use(express.json());
@@ -15,8 +14,9 @@ app.use(
   express.urlencoded({
     extended: true, 
   })
-);
- 
+  );
+  
+connectDB();
 // mongoose
 //   .connect(process.env.MONGO_URL)
 //   .then(() => {
