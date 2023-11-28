@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const cryptoJS = require("crypto-js");
 const loginService = require("../service/loginService");
+const bcrypt = require('bcryptjs');
 
 module.exports = {
     login: async (req, res) => {
@@ -14,6 +15,7 @@ module.exports = {
                     message: "Không được để trống"
                 });
             } else {
+                console.log(req.body)
                 let result = await loginService.handleLogin(email, password);
                 if (result.statusCode == 0) {
                     return res.status(200).json({
@@ -67,9 +69,11 @@ module.exports = {
                 });
             }
 
+            const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+
             const newUser = new User({
                 email,
-                password: cryptoJS.AES.encrypt(password, process.env.SECRET_KEY).toString(),
+                password: hashedPassword,
                 name,
                 phoneNumber,
                 DOB,
