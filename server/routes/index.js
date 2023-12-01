@@ -1,4 +1,6 @@
 module.exports = [
   require('./user'),
-  require('./project')
+  require('./project'),
+  require('./mark'),
+  require('./class')
 ]

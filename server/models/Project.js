@@ -36,7 +36,7 @@ exports.get = async function(userId, projectId){
 exports.update = async function(projecyId,data){
     try{
         const project = await Project.findByIdAndUpdate(projecyId, data)
-        const result = Project.findById(project._id)
+        const result = await Project.findById(project._id)
         return result
     }catch(err){
         return err
@@ -54,11 +54,23 @@ exports.delete = async function(projectId){
 
 exports.addMark = async function(projectId, markId){
     try{
+        debugger
         const project = await Project.findById(projectId)
         project.listMark.push(markId)
         project.markModified('listMark')
         await project.save()
         return project
+    }catch(err){
+        return err
+    }
+}
+
+exports.listMark = async function(projectId){
+    try{
+        debugger
+        const project = await Project.findById(projectId).populate('listMark')
+        const marks = project.listMark
+        return marks
     }catch(err){
         return err
     }

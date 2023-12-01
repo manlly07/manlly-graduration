@@ -4,7 +4,7 @@ let checkEmail = (email) => {
     return new Promise(async (resolve, reject) => {
         try {
             let user = await User.findOne({
-                where: { username: uname }
+                where: { email: email }
             })
             if (user) {
                 resolve(true);
@@ -17,38 +17,37 @@ let checkEmail = (email) => {
     })
 }
 
-let handleLogin = (email, password) => {
-    return new Promise(async (resolve, reject) => {
-        try {
-            let result = {};
-            let checkEmailExist = await checkEmail(email);
-            if(checkEmailExist) {
-                let user = await User.findOne({
-                    attributes: ["id", "email", "password", "name", "phoneNumber", "DOB", "address", "role"],
-                    where: { username: username },
-                    raw: true
-                });
-                if(user) {
-                    let checkPassword = await bcrypt.compareSync(password, user.password);
-                    if( checkPassword) {
-                        result.data = user;
-                        result.statusCode = 0;
-                        result.message = "Đăng nhập thành công";
-                    } else {
-                        result.statusCode = 1;
-                        result.message = "Sai mật khẩu";
-                    }
+let handleLogin = async (email, password) => {
+    try {
+        let result = {};
+        let checkEmailExist = await checkEmail(email);
+        if (!checkEmailExist) {
+            let user = await User.findOne({
+                email: email
+            });
+            if (user) {
+                console.log(password)
+                let checkPassword = await bcrypt.compare(password, user.password);
+                console.log(checkPassword)
+                if (checkPassword) {
+                    result.data = user;
+                    result.statusCode = 0;
+                    result.message = "Đăng nhập thành công";
+                } else {
+                    result.statusCode = 1;
+                    result.message = "Sai mật khẩu";
                 }
-            } else {
-                result.statusCode = 2;
-                result.message = "Email không tồn tại";
             }
-            resolve(result);
-        } catch (error) {
-            reject(error);
+        } else {
+            result.statusCode = 2;
+            result.message = "Email không tồn tại";
         }
-    })
-}
+        return result;
+    } catch (error) {
+        throw error;
+    }
+};
+
 module.exports = {
     handleLogin: handleLogin,
 }

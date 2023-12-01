@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const MarkSchema = new Schema({
-    mark: {type: String, required: true},
-    type: {type: String, required: true},
+    mark: {type: Number, required: true},
+    type: { type: Number, enum: [0, 1, 2], required: true},
     teacherId : {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     date_created: Date
 }) 
@@ -27,6 +27,16 @@ exports.get = async function(markId){
     try{
         const mark = await Mark.findById(markId)
         return mark
+    }catch(err){
+        return err
+    }
+}
+
+exports.update = async function(markId,data){
+    try{
+        const mark = await Mark.findByIdAndUpdate(markId, data)
+        const result = await Mark.findById(mark._id)
+        return result
     }catch(err){
         return err
     }

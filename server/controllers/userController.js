@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const cryptoJS = require("crypto-js");
 const loginService = require("../service/loginService");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken')
 
 module.exports = {
     login: async (req, res) => {
@@ -14,12 +16,16 @@ module.exports = {
                     message: "Không được để trống"
                 });
             } else {
+                console.log(req.body)
                 let result = await loginService.handleLogin(email, password);
                 if (result.statusCode == 0) {
+                    const { JWT_SECRET_ACCESS_TOKEN, JWT_EXPRIRE_ACCESS_TOKEN } = process.env;
                     return res.status(200).json({
                         statusCode: result.statusCode,
                         message: result.message,
-                        userData: result.data
+                        // userData: result.data,
+                        token: jwt.sign({ _id: result.data._id, email: result.data.email, password: result.data.password, role: result.data.role }, 
+                            JWT_SECRET_ACCESS_TOKEN, { expiresIn: JWT_EXPRIRE_ACCESS_TOKEN })
                     });
                 } else {
                     return res.status(404).json({
@@ -67,9 +73,11 @@ module.exports = {
                 });
             }
 
+            const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+
             const newUser = new User({
                 email,
-                password: cryptoJS.AES.encrypt(password, process.env.SECRET_KEY).toString(),
+                password: hashedPassword,
                 name,
                 phoneNumber,
                 DOB,
@@ -80,10 +88,14 @@ module.exports = {
                 date_created: new Date()
             });
 
-            const savedUser = await newUser.save();
+            await newUser.save();
+
+            const { JWT_SECRET_ACCESS_TOKEN, JWT_EXPRIRE_ACCESS_TOKEN } = process.env;
             return res.status(200).json({
                 status: true,
-                message: "Đăng ký thành công"
+                message: "Đăng ký thành công",
+                token: jwt.sign({ _id: newUser._id, email: newUser.email, password: newUser.password, role: newUser.role }, 
+                    JWT_SECRET_ACCESS_TOKEN, { expiresIn: JWT_EXPRIRE_ACCESS_TOKEN })
             });
         } catch (error) {
             return res.status(500).json({
