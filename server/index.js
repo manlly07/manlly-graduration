@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const port = process.env.PORT || 5000;
 const routers = require("./routes")
 const connectDB = require('./config/database');
+const errorMiddleware = require('./middleware/errorMiddleware')
 
 
 dotenv.config();
@@ -29,16 +30,18 @@ connectDB();
 app.use(routers);
 
 // error handling
-// app.use(function(err, req, res, next){
+app.use(function(err, req, res, next){
 
-//   const message = err.raw?.message || err.message || err.sqlMessage || null;
+  const message = err.raw?.message || err.message || err.sqlMessage || null;
 
-//   console.error(err);
-//   log.create({ message: message, body: err, req: req });
+  console.error(err);
+  log.create({ message: message, body: err, req: req });
   
-//   return res.status(500).send({ message: message });
+  return res.status(500).send({ message: message });
 
-// });
+});
+
+// app.use(errorMiddleware)
 
 const server = app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
