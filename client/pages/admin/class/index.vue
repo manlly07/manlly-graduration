@@ -107,7 +107,7 @@ type Schema = z.output<typeof schema>;
 
 const roles = ["Admin", "Teacher", "User"];
 
-const state = ref({
+const state = ref({ 
   firstName: undefined,
   lastName: undefined,
   email: undefined,

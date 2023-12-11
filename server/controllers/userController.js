@@ -13,17 +13,18 @@ module.exports = {
             if (!email || !password) {
                 return res.status(400).json({
                     status: false,
-                    message: "Không được để trống"
+                    message: "Không được để trống" 
                 });
             } else {
                 console.log(req.body)
                 let result = await loginService.handleLogin(email, password);
+                console.log(result)
                 if (result.statusCode == 0) {
                     const { JWT_SECRET_ACCESS_TOKEN, JWT_EXPRIRE_ACCESS_TOKEN } = process.env;
                     return res.status(200).json({
                         statusCode: result.statusCode,
                         message: result.message,
-                        // userData: result.data,
+                        data: result.data,
                         token: jwt.sign({ _id: result.data._id, email: result.data.email, password: result.data.password, role: result.data.role }, 
                             JWT_SECRET_ACCESS_TOKEN, { expiresIn: JWT_EXPRIRE_ACCESS_TOKEN })
                     });
@@ -175,4 +176,20 @@ module.exports = {
             });
         }
     },
+
+    getAllTeacherAndStudent: async (req, res) => {
+        try {
+            let users = await User.find({ role: { $ne: 2 } });
+    
+            return res.status(200).json({
+                status: true,
+                userData: users
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: false,
+                message: error.message
+            });
+        }
+    }
 };
