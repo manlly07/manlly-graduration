@@ -1,12 +1,14 @@
 <script setup lang="ts">
 // @ts-ignore
-import * as z from "zod";
+import { ref, onMounted, computed } from 'vue';
+import * as z from 'zod';
 import AdminLayout from "~/layouts/AdminLayout.vue";
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+import axios from 'axios';
 
 const columns = [
   {
-    key: "id",
+    key: "_id",
     label: "ID",
     sortable: true,
   },
@@ -16,8 +18,8 @@ const columns = [
     sortable: true,
   },
   {
-    key: "title",
-    label: "Title",
+    key: "phoneNumber",
+    label: "Phonenumber",
     sortable: true,
   },
   {
@@ -36,106 +38,19 @@ const columns = [
   },
 ];
 
-const people = [
-  {
-    id: 1,
-    name: "Lindsay Walton",
-    title: "Front-end Developer",
-    email: "lindsay.walton@example.com",
-    role: "Member",
-  },
-  {
-    id: 2,
-    name: "Courtney Henry",
-    title: "Designer",
-    email: "courtney.henry@example.com",
-    role: "Admin",
-  },
-  {
-    id: 3,
-    name: "Tom Cook",
-    title: "Director of Product",
-    email: "tom.cook@example.com",
-    role: "Member",
-  },
-  {
-    id: 4,
-    name: "Whitney Francis",
-    title: "Copywriter",
-    email: "whitney.francis@example.com",
-    role: "Admin",
-  },
-  {
-    id: 5,
-    name: "Leonard Krasner",
-    title: "Senior Designer",
-    email: "leonard.krasner@example.com",
-    role: "Owner",
-  },
-  {
-    id: 6,
-    name: "Floyd Miles",
-    title: "Principal Designer",
-    email: "floyd.miles@example.com",
-    role: "Member",
-  },
-  {
-    id: 6,
-    name: "Floyd Miles",
-    title: "Principal Designer",
-    email: "floyd.miles@example.com",
-    role: "Member",
-  },
-  {
-    id: 1,
-    name: "Lindsay Walton",
-    title: "Front-end Developer",
-    email: "lindsay.walton@example.com",
-    role: "Member",
-  },
-  {
-    id: 2,
-    name: "Courtney Henry",
-    title: "Designer",
-    email: "courtney.henry@example.com",
-    role: "Admin",
-  },
-  {
-    id: 3,
-    name: "Tom Cook",
-    title: "Director of Product",
-    email: "tom.cook@example.com",
-    role: "Member",
-  },
-  {
-    id: 4,
-    name: "Whitney Francis",
-    title: "Copywriter",
-    email: "whitney.francis@example.com",
-    role: "Admin",
-  },
-  {
-    id: 5,
-    name: "Leonard Krasner",
-    title: "Senior Designer",
-    email: "leonard.krasner@example.com",
-    role: "Owner",
-  },
-  {
-    id: 6,
-    name: "Floyd Miles",
-    title: "Principal Designer",
-    email: "floyd.miles@example.com",
-    role: "Member",
-  },
-  {
-    id: 6,
-    name: "Floyd Miles",
-    title: "Principal Designer",
-    email: "floyd.miles@example.com",
-    role: "Member",
-  },
-];
+const people = ref<any[]>([]);
+
+async function loadData() {
+  try {
+    const response = await axios.get('http://localhost:5000/api/user/getAllTeacherAndStudent');
+    console.log(response);
+    people.value = response.data.userData;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+onMounted(loadData);
 
 const items = (row: any) => [
   [
@@ -174,16 +89,15 @@ const table = ref({
 
 const pageCount = 10;
 const filteredAndPagedRows = computed(() => {
-  let filteredRows = people;
+  let filteredRows = people.value;
   if (table.value.q) {
-    filteredRows = people.filter((person) => {
+    filteredRows = people.value.filter((person) => {
       return Object.values(person).some((value) => {
         return String(value)
           .toLowerCase()
           .includes(table.value.q.toLowerCase());
       });
     });
-    // return filteredRows;
   }
   const pagedRows = filteredRows.slice(
     (table.value.page - 1) * pageCount,
@@ -193,7 +107,7 @@ const filteredAndPagedRows = computed(() => {
   return pagedRows;
 });
 
-const totalCount = computed(() => people.length);
+const totalCount = computed(() => people.value.length);
 
 const itemExport = [
   [
@@ -220,7 +134,7 @@ const schema = z.object({
 });
 type Schema = z.output<typeof schema>;
 
-const roles = ["Admin", "Teacher", "User"];
+const roles = ["Admin", "Teacher", "Student"];
 
 const state = ref({
   firstName: undefined,
@@ -237,6 +151,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
   console.log(event.data);
 }
 </script>
+
 
 <template>
   <AdminLayout>
@@ -277,7 +192,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
         :sort="{ column: 'title' }"
       >
         <template #name-data="{ row }">
-          <NuxtLink :to="`/admin/users/${row.id}`">{{ row.name }}</NuxtLink>
+          <NuxtLink :to="`/admin/users/${row._id}`">{{ row.name }}</NuxtLink>
         </template>
         <template #actions-data="{ row }">
           <UDropdown :items="items(row)">
