@@ -13,7 +13,7 @@ module.exports = {
             if (!email || !password) {
                 return res.status(400).json({
                     status: false,
-                    message: "Không được để trống" 
+                    message: "Không được để trống"
                 });
             } else {
                 console.log(req.body)
@@ -25,7 +25,7 @@ module.exports = {
                         statusCode: result.statusCode,
                         message: result.message,
                         data: result.data,
-                        token: jwt.sign({ _id: result.data._id, email: result.data.email, password: result.data.password, role: result.data.role }, 
+                        token: jwt.sign({ _id: result.data._id, email: result.data.email, password: result.data.password, role: result.data.role },
                             JWT_SECRET_ACCESS_TOKEN, { expiresIn: JWT_EXPRIRE_ACCESS_TOKEN })
                     });
                 } else {
@@ -95,7 +95,7 @@ module.exports = {
             return res.status(200).json({
                 status: true,
                 message: "Đăng ký thành công",
-                token: jwt.sign({ _id: newUser._id, email: newUser.email, password: newUser.password, role: newUser.role }, 
+                token: jwt.sign({ _id: newUser._id, email: newUser.email, password: newUser.password, role: newUser.role },
                     JWT_SECRET_ACCESS_TOKEN, { expiresIn: JWT_EXPRIRE_ACCESS_TOKEN })
             });
         } catch (error) {
@@ -180,10 +180,29 @@ module.exports = {
     getAllTeacherAndStudent: async (req, res) => {
         try {
             let users = await User.find({ role: { $ne: 2 } });
-    
+
             return res.status(200).json({
                 status: true,
                 userData: users
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: false,
+                message: error.message
+            });
+        }
+    },
+    updatePassword: async (req, res) => {
+        try {
+            const userId = req.params.id;
+            const { newPassword } = req.body;
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+            await User.findByIdAndUpdate(userId, { password: hashedPassword });
+
+            return res.status(200).json({
+                status: true,
+                message: "Cập nhật mật khẩu thành công"
             });
         } catch (error) {
             return res.status(500).json({

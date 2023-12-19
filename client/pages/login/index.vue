@@ -27,7 +27,7 @@ export default {
     name: "login",
     data() {
         return {
-            email: '',
+            email: '', 
             password: '',
             showPassword: false,
         }

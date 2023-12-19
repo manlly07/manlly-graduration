@@ -1,8 +1,7 @@
 <template>
   <header class="p-4 w-full flex items-center justify-between border shadow-lg">
     <div class="flex items-center justify-center">
-      <UInput v-model="search" icon="i-heroicons-magnifying-glass-20-solid" size="md" color="white" :trailing="false"
-        name="input" placeholder="Search..." />
+
     </div>
     <div class="flex-1 flex justify-end gap-4">
       <template v-for="link in links">

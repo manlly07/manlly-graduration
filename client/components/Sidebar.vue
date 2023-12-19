@@ -8,7 +8,7 @@
             <li class="p-2 font-medium rounded-lg"
                 :class="link.url == route.fullPath ? 'text-primay' : '' "
             >
-                <NuxtLink class="flex items-center gap-4" :to="link.url">
+                <NuxtLink class="flex items-center gap-4 no-underline" :to="link.url">
                     <Icon 
                             v-if="link.icon" 
                             :name="link.icon" 
