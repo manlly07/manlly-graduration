@@ -6,8 +6,12 @@
 export default {
   name: 'App',
   created() {
+  if (typeof localStorage !== 'undefined') {
     this.checkAuthentication();
-  },
+  } else {
+    console.error('localStorage is not available.');
+  }
+},
   methods: {
     checkAuthentication() {
       const token = localStorage.getItem("token")

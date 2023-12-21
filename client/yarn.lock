@@ -6791,7 +6791,12 @@
   dependencies:
     "@vue/devtools-api" "^6.5.0"
 
-"vue@^2.7.0 || ^3.2.25", "vue@^3.0.0", "vue@^3.0.0-0 || ^2.6.0", "vue@^3.2.0", "vue@^3.2.25", "vue@^3.3.4", "vue@^3.3.6", "vue@>= 3", "vue@>=2.7 || >=3", "vue@>=3", "vue@3.3.6":
+"vue-toast-notification@^3.1.2":
+  "integrity" "sha512-oNRL/W9aaHoeScp+iTIW7k09vM16/+8aptp2maa+7qTB43JuxmAgKdXKFYtf+uvSNOYYq2BIWgLCeJ61pwom/A=="
+  "resolved" "https://registry.npmjs.org/vue-toast-notification/-/vue-toast-notification-3.1.2.tgz"
+  "version" "3.1.2"
+
+"vue@^2.7.0 || ^3.2.25", "vue@^3.0", "vue@^3.0.0", "vue@^3.0.0-0 || ^2.6.0", "vue@^3.2.0", "vue@^3.2.25", "vue@^3.3.4", "vue@^3.3.6", "vue@>= 3", "vue@>=2.7 || >=3", "vue@>=3", "vue@3.3.6":
   "integrity" "sha512-jJIDETeWJnoY+gfn4ZtMPMS5KtbP4ax+CT4dcQFhTnWEk8xMupFyQ0JxL28nvT/M4+p4a0ptxaV2WY0LiIxvRg=="
   "resolved" "https://registry.npmjs.org/vue/-/vue-3.3.6.tgz"
   "version" "3.3.6"
