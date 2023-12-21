@@ -43,7 +43,7 @@ exports.update = async function(projecyId,data){
     }
 }
 
-exports.delete = async function(projectId){
+exports.delete = async function(projectId){ 
     try{
         const result = await Project.findByIdAndDelete(projectId)
         return result

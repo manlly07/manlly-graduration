@@ -82,6 +82,28 @@ const items = (row: any) => [
   ],
 ];
 
+function downloadCsv(filename: string, csvData: string) {
+  const element = document.createElement("a");
+  element.setAttribute("href", `data:text/csv;charset=utf-8,${encodeURIComponent(csvData)}`);
+  element.setAttribute("download", filename);
+  element.style.display = "none";
+
+  document.body.appendChild(element);
+  element.click();
+  document.body.removeChild(element);
+}
+
+async function exportToCsv() {
+  try {
+    const csvData = people.value
+      .map(person => Object.values(person).map(value => String(value)).join(','))
+      .join('\n');
+
+    downloadCsv('export.csv', csvData);
+  } catch (error) {
+    console.error(error);
+  }
+}
 const table = ref({
   q: "",
   page: 1,
@@ -108,23 +130,6 @@ const filteredAndPagedRows = computed(() => {
 });
 
 const totalCount = computed(() => people.value.length);
-
-const itemExport = [
-  [
-    {
-      label: "Csv",
-      avatar: {
-        src: "https://avatars.githubusercontent.com/u/739984?v=4",
-      },
-    },
-    {
-      label: "Pdf",
-      avatar: {
-        src: "https://avatars.githubusercontent.com/u/739984?v=4",
-      },
-    },
-  ],
-];
 
 const isOpen = ref(false);
 
@@ -157,101 +162,50 @@ async function submit(event: FormSubmitEvent<Schema>) {
   <AdminLayout>
     <div class="border-2 p-10">
       <div class="flex gap-4 justify-end mb-4">
-        <UInput
-          size="xl"
-          v-model="table.q"
-          color="white"
-          variant="outline"
-          name="input"
-          placeholder="Search..."
-          icon="i-heroicons-magnifying-glass-20-solid"
-        />
-        <UDropdown
-          :items="itemExport"
-          mode="click"
-          :popper="{ placement: 'bottom-start' }"
-        >
-          <UButton
-            color="indigo"
-            variant="outline"
-            label="Export"
-            icon="i-heroicons-pencil-square"
-          />
-        </UDropdown>
-        <UButton
-          color="primary"
-          variant="solid"
-          label="Add new user"
-          icon="i-heroicons-pencil-square"
-          @click="isOpen = true"
-        />
+        <UInput size="xl" v-model="table.q" color="white" variant="outline" name="input" placeholder="Search..."
+          icon="i-heroicons-magnifying-glass-20-solid" />
+
+        <UButton color="indigo" variant="outline" label="Export" icon="i-heroicons-pencil-square" @click="exportToCsv" />
+
+        <UButton color="primary" variant="solid" label="Add new user" icon="i-heroicons-pencil-square"
+          @click="isOpen = true" />
       </div>
-      <UTable
-        :columns="columns"
-        :rows="filteredAndPagedRows"
-        :sort="{ column: 'title' }"
-      >
+      <UTable :columns="columns" :rows="filteredAndPagedRows" :sort="{ column: 'title' }">
         <template #name-data="{ row }">
           <NuxtLink :to="`/admin/users/${row._id}`">{{ row.name }}</NuxtLink>
         </template>
         <template #actions-data="{ row }">
           <UDropdown :items="items(row)">
-            <UButton
-              color="gray"
-              variant="ghost"
-              icon="i-heroicons-ellipsis-horizontal-20-solid"
-            />
+            <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
           </UDropdown>
         </template>
       </UTable>
       <div class="flex justify-end mt-4">
-        <UPagination
-          v-model="table.page"
-          :page-count="pageCount"
-          :total="totalCount"
-        />
+        <UPagination v-model="table.page" :page-count="pageCount" :total="totalCount" />
       </div>
     </div>
     <template>
       <div>
         <UModal v-model="isOpen" prevent-close>
-          <UCard
-            :ui="{
-              ring: '',
-              divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-            }"
-          >
+          <UCard :ui="{
+            ring: '',
+            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+          }">
             <template #header>
               <div class="flex items-center justify-between">
-                <h3
-                  class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-                >
+                <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
                   Add a new user
                 </h3>
-                <UButton
-                  color="gray"
-                  variant="ghost"
-                  icon="i-heroicons-x-mark-20-solid"
-                  class="-my-1"
-                  @click="isOpen = false"
-                />
+                <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                  @click="isOpen = false" />
               </div>
             </template>
-
             <UForm :schema="schema" :state="state" @submit="submit">
               <div class="flex gap-4">
-                <UFormGroup
-                  class="mb-4 flex-1"
-                  label="First Name"
-                  name="firstName"
-                >
+                <UFormGroup class="mb-4 flex-1" label="First Name" name="name">
                   <UInput v-model="state.firstName" placeholder="First Name" />
                 </UFormGroup>
-                <UFormGroup
-                  class="mb-4 flex-1"
-                  label="Last Name"
-                  name="lastName"
-                >
+                <UFormGroup class="mb-4 flex-1" label="Last Name" name="lastName">
                   <UInput v-model="state.lastName" placeholder="Last Name" />
                 </UFormGroup>
               </div>
@@ -259,27 +213,11 @@ async function submit(event: FormSubmitEvent<Schema>) {
                 <UInput v-model="state.email" placeholder="Email" />
               </UFormGroup>
               <div class="flex gap-4">
-                <UFormGroup
-                  class="mb-4 flex-1"
-                  label="Password"
-                  name="password"
-                >
-                  <UInput
-                    v-model="state.password"
-                    type="password"
-                    placeholder="Enter your password"
-                  />
+                <UFormGroup class="mb-4 flex-1" label="Password" name="password">
+                  <UInput v-model="state.password" type="password" placeholder="Enter your password" />
                 </UFormGroup>
-                <UFormGroup
-                  class="mb-4 flex-1"
-                  label="Confirm Password"
-                  name="confirmPassword"
-                >
-                  <UInput
-                    v-model="state.password"
-                    type="password"
-                    placeholder="Enter your confirm password"
-                  />
+                <UFormGroup class="mb-4 flex-1" label="Confirm Password" name="confirmPassword">
+                  <UInput v-model="state.password" type="password" placeholder="Enter your confirm password" />
                 </UFormGroup>
               </div>
               <div class="flex gap-4">

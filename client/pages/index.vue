@@ -26,7 +26,7 @@ export default {
         } else if (role === 1) {
           this.$router.push('/teacher');
         } else if (role === 2) {
-          this.$router.push('/admin');
+          this.$router.push('/admin/users');
         }
       }
     },

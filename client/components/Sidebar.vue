@@ -29,7 +29,6 @@
 const route = useRoute()
 
 const links = ref([
-    { name: 'Dashboard', url: '/admin', icon: 'icon-park-outline:hamburger-button' },
     { name: 'Users', url: '/admin/users', icon: 'material-symbols:groups-2' },
     { name: 'Messages', url: '/admin/messages', icon: 'material-symbols:chat-outline' },
     { name: 'Class', url: '/admin/class', icon: 'material-symbols:chat-outline' },
