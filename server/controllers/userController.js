@@ -75,7 +75,13 @@ module.exports = {
             }
 
             const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
-
+            if( role == 'Admin') {
+                role = 2;
+            } else if( role == 'Teacher') {
+                role = 1;
+            } else {
+                role = 0;
+            }
             const newUser = new User({
                 email,
                 password: hashedPassword,
@@ -130,7 +136,7 @@ module.exports = {
             let userId = req.params.id;
 
             await User.findByIdAndDelete(userId);
-
+ 
             return res.status(200).json({
                 status: true,
                 message: "Xóa người dùng thành công"

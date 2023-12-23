@@ -21,7 +21,7 @@
                     </div>
                     <div class="mt-4">
                         <span class="font-medium text-sm">Date Of Birth: </span>
-                        <span>{{ userData.DOB }}</span>
+                        <span>{{ formattedDOB }}</span>
                     </div>
                     <div class="mt-4">
                         <span class="font-medium text-sm">Address: </span>
@@ -29,8 +29,8 @@
                     </div>
                 </div>
                 <div class="flex gap-4 my-4 m-auto">
-                    <UButton color="primary" variant="solid" size="xl">Edit</UButton>
-                    <UButton color="red" variant="outline" size="xl">Delete</UButton>
+                    <UButton color="primary" variant="solid" size="xl" @click="isOpen = true">Edit</UButton>
+                    <UButton color="red" variant="outline" size="xl" @click="openDeleteModal">Delete</UButton>
                 </div>
             </div>
             <div class="flex-[2]">
@@ -46,6 +46,71 @@
                 <NuxtPage />
             </div>
         </div>
+        <template>
+            <div>
+                <UModal v-model="isOpen" prevent-close>
+                    <UCard :ui="{
+                        ring: '',
+                        divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+                    }">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                                    Add a new user
+                                </h3>
+                                <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                                    @click="isOpen = false" />
+                            </div>
+                        </template>
+                        <UForm :schema="schema" :state="state" @submit="submit">
+                            <div class="flex gap-4">
+                                <UFormGroup class="mb-4 flex-1" label="First Name" name="name">
+                                    <UInput v-model="state.firstName" placeholder="First Name" />
+                                </UFormGroup>
+                                <UFormGroup class="mb-4 flex-1" label="Last Name" name="lastName">
+                                    <UInput v-model="state.lastName" placeholder="Last Name" />
+                                </UFormGroup>
+                            </div>
+                            <UFormGroup class="mb-4 flex-1" label="Email" name="email">
+                                <UInput v-model="state.email" placeholder="Email" />
+                            </UFormGroup>
+                            <div class="flex gap-4">
+                                <UFormGroup class="mb-4 flex-1" label="Password" name="password">
+                                    <UInput v-model="state.password" type="password" placeholder="Enter your password" />
+                                </UFormGroup>
+                                <UFormGroup class="mb-4 flex-1" label="Confirm Password" name="confirmPassword">
+                                    <UInput v-model="state.password" type="password"
+                                        placeholder="Enter your confirm password" />
+                                </UFormGroup>
+                            </div>
+                            <div class="flex gap-4">
+                                <UFormGroup class="mb-4 flex-1" label="User role" name="role">
+                                    <USelect v-model="state.role" :options="roles" />
+                                </UFormGroup>
+                                <UFormGroup class="mb-4 flex-1" label="User role" name="role">
+                                    <USelect v-model="state.role" :options="roles" />
+                                </UFormGroup>
+                            </div>
+                            <UButton type="submit"> Submit </UButton>
+                        </UForm>
+                    </UCard>
+                </UModal>
+            </div>
+        </template>
+        <template>
+            <UModal v-model="isDeleteModalOpen" prevent-close>
+                <UCard>
+                    <div class="text-center p-6">
+                        <h3 class="text-lg font-semibold mb-4">Do you want to delete this account?</h3>
+                        <div class="flex justify-center gap-4">
+                            <UButton color="red" variant="solid" @click="deleteAccount">Accept</UButton>
+                            <UButton color="gray" variant="ghost" @click="closeDeleteModal">Cancel</UButton>
+                        </div>
+                    </div>
+                </UCard>
+            </UModal>
+
+        </template>
     </AdminLayout>
 </template>
 
@@ -54,6 +119,10 @@ import AdminLayout from '~/layouts/AdminLayout.vue';
 import axios from 'axios';
 import avatarStudent from '@/assets/images/avatar_student.jpg';
 import avatarTeacher from '@/assets/images/avatar_teacher.jpg';
+import { useToast } from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
+const route = useRoute()
+const toast = useToast();
 
 let userData = ref({
     email: '',
@@ -75,19 +144,73 @@ async function loadData() {
 }
 onMounted(loadData);
 
-const route = useRoute()
+const isOpen = ref(false);
+const isDeleteModalOpen = ref(false);
+
+const roles = ["Admin", "Teacher", "Student"];
+
+const state = ref({
+    firstName: undefined,
+    lastName: undefined,
+    email: undefined,
+    class: undefined,
+    password: undefined,
+    confirmPassword: undefined,
+    role: roles[0],
+});
+
 const roleText = computed(() => {
     return userData.value.role === 0 ? 'Student' : 'Teacher';
 });
 const getAvatarSrc = computed(() => {
-  if (userData.value.role === 0) {
-    return avatarStudent;
-  } else {
-    return avatarTeacher;
-  }
+    if (userData.value.role === 0) {
+        return avatarStudent;
+    } else {
+        return avatarTeacher;
+    }
 });
 
-console.log(getAvatarSrc)
+const formattedDOB = computed(() => {
+    const rawDOB = userData.value.DOB;
+    if (rawDOB) {
+        const date = new Date(rawDOB);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    return '';
+});
+
+function openDeleteModal() {
+    isDeleteModalOpen.value = true;
+}
+
+function closeDeleteModal() {
+    isDeleteModalOpen.value = false;
+}
+
+async function deleteAccount() {
+    const router = useRouter();
+    try {
+        const id = route.params.id;
+        const response = await axios.delete(`http://localhost:5000/api/user/deleteUser/${id}`);
+
+        closeDeleteModal();
+
+        if (response.status === 200 && response.data.status) {
+            toast.success("Delete successfully.");
+            router.push('/admin/users');
+        } else {
+            toast.error(response.data.message || "An error occurred while deleting.");
+        }
+    } catch (error) {
+        console.error(error);
+        toast.error(error);
+    }
+}
+
+
 const links = ref([
     { name: 'Account', path: 'admin-users-id', url: `/admin/users/${route.params.id}`, icon: 'material-symbols:person-check-rounded' },
     { name: 'Security', path: 'admin-users-id-security', url: `/admin/users/${route.params.id}/security`, icon: 'material-symbols:lock-open-outline-rounded' },

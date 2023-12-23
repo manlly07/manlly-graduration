@@ -5,6 +5,9 @@ import * as z from 'zod';
 import AdminLayout from "~/layouts/AdminLayout.vue";
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
 import axios from 'axios';
+import { useToast } from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
+const toast = useToast();
 
 const columns = [
   {
@@ -43,7 +46,6 @@ const people = ref<any[]>([]);
 async function loadData() {
   try {
     const response = await axios.get('http://localhost:5000/api/user/getAllTeacherAndStudent');
-    console.log(response);
     people.value = response.data.userData;
   } catch (error) {
     console.error(error);
@@ -134,27 +136,84 @@ const totalCount = computed(() => people.value.length);
 const isOpen = ref(false);
 
 const schema = z.object({
-  email: z.string().email("Invalid email"),
-  password: z.string().min(8, "Must be at least 8 characters"),
+  name: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email").min(1, "Email is required"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+  address: z.string().min(1, "Address is required"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  confirmPassword: z.string().refine((data) => data === state.value.password, {
+    message: "Passwords do not match",
+  }),
 });
 type Schema = z.output<typeof schema>;
 
 const roles = ["Admin", "Teacher", "Student"];
+const study = [
+  {
+    department: "CNTT CLC",
+    major: ["KHMT", "HTTT", "MMT"]
+  },
+  {
+    department: "CNTT",
+    major: ["CNTT", "CNTTJapan"]
+  },
+  {
+    department: "Computer and Robotics",
+    major: ["Computer Engineering", "Robotics Engineering"]
+  },
+  {
+    department: "Engineering Physics",
+    major: ["Engineering Physics"]
+  },
+  {
+    department: "Mechanical Engineering",
+    major: ["Mechanical Engineering"]
+  },
+  {
+    department: "Aerospace Engineering",
+    major: ["Aerospace Engineering"]
+  },
+];
 
 const state = ref({
-  firstName: undefined,
-  lastName: undefined,
+  name: undefined,
   email: undefined,
-  class: undefined,
+  phoneNumber: undefined,
+  address: undefined,
   password: undefined,
   confirmPassword: undefined,
   role: roles[0],
+  department: study[0].department,
+  major: study[0].major[0]
 });
 
+const departmentOptions = computed(() => study.map(dep => dep.department));
+
+const majorOptions = computed(() => {
+  const selectedDepartment = state.value.department;
+  const selectedDepartmentObj = study.find(dep => dep.department === selectedDepartment);
+  return selectedDepartmentObj ? selectedDepartmentObj.major : [];
+});
+
+
 async function submit(event: FormSubmitEvent<Schema>) {
-  // Do something with data
   console.log(event.data);
+  try {
+    const response = await axios.post('http://localhost:5000/api/user/logup', event.data);
+    const stateResponse = response.data.status;
+    if (stateResponse) {
+      isOpen.value = false;
+      toast.success("Register account successfully.");
+      loadData();
+    } else {
+      toast.error(response.data.message);
+    }
+  } catch (error) {
+    console.error("Error during form submission:", error);
+    toast.error("An error occurred during form submission.");
+  }
 }
+
 </script>
 
 
@@ -202,32 +261,41 @@ async function submit(event: FormSubmitEvent<Schema>) {
             </template>
             <UForm :schema="schema" :state="state" @submit="submit">
               <div class="flex gap-4">
-                <UFormGroup class="mb-4 flex-1" label="First Name" name="name">
-                  <UInput v-model="state.firstName" placeholder="First Name" />
+                <UFormGroup class="mb-4 flex-1" label="Name" name="name">
+                  <UInput v-model="state.name" placeholder="Username" />
                 </UFormGroup>
-                <UFormGroup class="mb-4 flex-1" label="Last Name" name="lastName">
-                  <UInput v-model="state.lastName" placeholder="Last Name" />
+                <UFormGroup class="mb-4 flex-1" label="Email" name="email">
+                  <UInput v-model="state.email" placeholder="Email" />
                 </UFormGroup>
               </div>
-              <UFormGroup class="mb-4 flex-1" label="Email" name="email">
-                <UInput v-model="state.email" placeholder="Email" />
-              </UFormGroup>
+              <div class="flex gap-4">
+                <UFormGroup class="mb-4 flex-1" label="Phonenumber" name="phoneNumber">
+                  <UInput v-model="state.phoneNumber" placeholder="Phonenumber" />
+                </UFormGroup>
+                <UFormGroup class="mb-4 flex-1" label="Address" name="address">
+                  <UInput v-model="state.address" placeholder="Address" />
+                </UFormGroup>
+              </div>
+
               <div class="flex gap-4">
                 <UFormGroup class="mb-4 flex-1" label="Password" name="password">
                   <UInput v-model="state.password" type="password" placeholder="Enter your password" />
                 </UFormGroup>
                 <UFormGroup class="mb-4 flex-1" label="Confirm Password" name="confirmPassword">
-                  <UInput v-model="state.password" type="password" placeholder="Enter your confirm password" />
+                  <UInput v-model="state.confirmPassword" type="password" placeholder="Enter your confirm password" />
                 </UFormGroup>
               </div>
               <div class="flex gap-4">
                 <UFormGroup class="mb-4 flex-1" label="User role" name="role">
                   <USelect v-model="state.role" :options="roles" />
                 </UFormGroup>
-                <UFormGroup class="mb-4 flex-1" label="User role" name="role">
-                  <USelect v-model="state.role" :options="roles" />
+                <UFormGroup class="mb-4 flex-1" label="User department" name="department">
+                  <USelect v-model="state.department" :options="departmentOptions" />
                 </UFormGroup>
               </div>
+              <UFormGroup class="mb-4 flex-1" label="User major" name="major">
+                  <USelect v-model="state.major" :options="majorOptions" />
+                </UFormGroup>
               <UButton type="submit"> Submit </UButton>
             </UForm>
           </UCard>

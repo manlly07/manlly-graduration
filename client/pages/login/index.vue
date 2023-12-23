@@ -50,7 +50,7 @@ export default {
                         await this.$router.push('/teacher');
                     }
                     else if (response.data.data.role === 2) {
-                        await this.$router.push('/admin');
+                        await this.$router.push('/admin/users');
                     }
                 } else {
                     console.log(response.data.message);

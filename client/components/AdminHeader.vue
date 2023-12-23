@@ -8,7 +8,7 @@
         <button class="flex items-center">
           <Icon v-if="link.icon" :name="link.icon" class="mr-0.5 mt-[2px]" size="25" />
         </button>
-      </template>
+      </template> 
       <UDropdown :items="items" :ui="{ item: { disabled: 'cursor-text select-text' } }"
         :popper="{ placement: 'bottom-start' }">
         <UAvatar src="https://avatars.githubusercontent.com/u/739984?v=4" />
@@ -30,6 +30,7 @@
 </template>
 
 <script setup>
+const router = useRouter();
 const items = [
   [
     {
@@ -40,28 +41,12 @@ const items = [
   ],
   [
     {
-      label: "Settings",
-      icon: "i-heroicons-cog-8-tooth",
-    },
-  ],
-  [
-    {
-      label: "Documentation",
-      icon: "i-heroicons-book-open",
-    },
-    {
-      label: "Changelog",
-      icon: "i-heroicons-megaphone",
-    },
-    {
-      label: "Status",
-      icon: "i-heroicons-signal",
-    },
-  ],
-  [
-    {
       label: "Sign out",
       icon: "i-heroicons-arrow-left-on-rectangle",
+      click: () => {
+        localStorage.setItem('token', '');
+        router.push('/login')
+      }
     },
   ],
 ];

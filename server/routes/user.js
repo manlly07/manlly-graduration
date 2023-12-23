@@ -10,4 +10,6 @@ api.get("/api/user/getAllTeacherAndStudent", userController.getAllTeacherAndStud
 api.get("/api/user/getUserInfor/:id", userController.getAUserInfor)
 
 api.put("/api/user/updatePassword/:id", userController.updatePassword)
+
+api.delete("/api/user/deleteUser/:id", userController.deleteUser); 
 module.exports = api
