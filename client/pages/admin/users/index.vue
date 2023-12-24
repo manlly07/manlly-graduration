@@ -7,6 +7,7 @@ import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
 import axios from 'axios';
 import { useToast } from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
+
 const toast = useToast();
 
 const columns = [
@@ -184,7 +185,8 @@ const state = ref({
   confirmPassword: undefined,
   role: roles[0],
   department: study[0].department,
-  major: study[0].major[0]
+  major: study[0].major[0],
+  DOB: undefined
 });
 
 const departmentOptions = computed(() => study.map(dep => dep.department));
@@ -276,7 +278,9 @@ async function submit(event: FormSubmitEvent<Schema>) {
                   <UInput v-model="state.address" placeholder="Address" />
                 </UFormGroup>
               </div>
-
+              <UFormGroup class="mb-4 flex-1" label="Date of Birth" name="DOB">
+                <UInput v-model="state.DOB" type="date" />
+              </UFormGroup>
               <div class="flex gap-4">
                 <UFormGroup class="mb-4 flex-1" label="Password" name="password">
                   <UInput v-model="state.password" type="password" placeholder="Enter your password" />
@@ -294,8 +298,8 @@ async function submit(event: FormSubmitEvent<Schema>) {
                 </UFormGroup>
               </div>
               <UFormGroup class="mb-4 flex-1" label="User major" name="major">
-                  <USelect v-model="state.major" :options="majorOptions" />
-                </UFormGroup>
+                <USelect v-model="state.major" :options="majorOptions" />
+              </UFormGroup>
               <UButton type="submit"> Submit </UButton>
             </UForm>
           </UCard>
