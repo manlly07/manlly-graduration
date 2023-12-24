@@ -53,7 +53,7 @@ module.exports = {
                 DOB,
                 address,
                 department,
-                majors,
+                Majors,
                 role
             } = req.body;
 
@@ -84,13 +84,13 @@ module.exports = {
             }
             const newUser = new User({
                 email,
-                password: hashedPassword,
+                password: hashedPassword, 
                 name,
                 phoneNumber,
                 DOB,
                 address,
                 Department: department,
-                Majors: majors,
+                Majors: Majors,
                 role,
                 date_created: new Date()
             });
@@ -105,6 +105,7 @@ module.exports = {
                     JWT_SECRET_ACCESS_TOKEN, { expiresIn: JWT_EXPRIRE_ACCESS_TOKEN })
             });
         } catch (error) {
+            console.log(error)
             return res.status(500).json({
                 status: false,
                 message: error.message

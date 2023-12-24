@@ -27,6 +27,14 @@
                         <span class="font-medium text-sm">Address: </span>
                         <span>{{ userData.address }}</span>
                     </div>
+                    <div class="mt-4">
+                        <span class="font-medium text-sm">Department: </span>
+                        <span>{{ userData.Department }}</span>
+                    </div>
+                    <div class="mt-4">
+                        <span class="font-medium text-sm">Major: </span>
+                        <span>{{ userData.Majors }}</span>
+                    </div>
                 </div>
                 <div class="flex gap-4 my-4 m-auto">
                     <UButton color="primary" variant="solid" size="xl" @click="isOpen = true">Edit</UButton>
@@ -56,7 +64,7 @@
                         <template #header>
                             <div class="flex items-center justify-between">
                                 <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                                    Add a new user
+                                    Update user information
                                 </h3>
                                 <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
                                     @click="isOpen = false" />
@@ -64,33 +72,34 @@
                         </template>
                         <UForm :schema="schema" :state="state" @submit="submit">
                             <div class="flex gap-4">
-                                <UFormGroup class="mb-4 flex-1" label="First Name" name="name">
-                                    <UInput v-model="state.firstName" placeholder="First Name" />
+                                <UFormGroup class="mb-4 flex-1" label="Name" name="name">
+                                    <UInput v-model="state.name" placeholder="Username" />
                                 </UFormGroup>
-                                <UFormGroup class="mb-4 flex-1" label="Last Name" name="lastName">
-                                    <UInput v-model="state.lastName" placeholder="Last Name" />
+
+                                <UFormGroup class="mb-4 flex-1" label="Email" name="email">
+                                    <UInput v-model="state.email" placeholder="Email" />
                                 </UFormGroup>
                             </div>
-                            <UFormGroup class="mb-4 flex-1" label="Email" name="email">
-                                <UInput v-model="state.email" placeholder="Email" />
+                            <div class="p-2 text-center bg-[#f2f2f3] text-[#a8aaae] w-fit text-xs">{{ roleText }}</div>
+                            <div class="flex gap-4">
+                                <UFormGroup class="mb-4 flex-1" label="Phonenumber" name="phoneNumber">
+                                    <UInput v-model="state.phoneNumber" placeholder="Phonenumber" />
+                                </UFormGroup>
+                                <UFormGroup class="mb-4 flex-1" label="Address" name="address">
+                                    <UInput v-model="state.address" placeholder="Address" />
+                                </UFormGroup>
+                            </div>
+                            <UFormGroup class="mb-4 flex-1" label="Date of Birth" name="DOB">
+                                <UInput v-model="state.DOB" type="date" />
                             </UFormGroup>
                             <div class="flex gap-4">
-                                <UFormGroup class="mb-4 flex-1" label="Password" name="password">
-                                    <UInput v-model="state.password" type="password" placeholder="Enter your password" />
-                                </UFormGroup>
-                                <UFormGroup class="mb-4 flex-1" label="Confirm Password" name="confirmPassword">
-                                    <UInput v-model="state.password" type="password"
-                                        placeholder="Enter your confirm password" />
+                                <UFormGroup class="mb-4 flex-1" label="User department" name="department">
+                                    <USelect v-model="state.department" :options="departmentOptions" />
                                 </UFormGroup>
                             </div>
-                            <div class="flex gap-4">
-                                <UFormGroup class="mb-4 flex-1" label="User role" name="role">
-                                    <USelect v-model="state.role" :options="roles" />
-                                </UFormGroup>
-                                <UFormGroup class="mb-4 flex-1" label="User role" name="role">
-                                    <USelect v-model="state.role" :options="roles" />
-                                </UFormGroup>
-                            </div>
+                            <UFormGroup class="mb-4 flex-1" label="User major" name="majors">
+                                <USelect v-model="state.Majors" :options="majorOptions" />
+                            </UFormGroup>
                             <UButton type="submit"> Submit </UButton>
                         </UForm>
                     </UCard>
@@ -114,15 +123,17 @@
     </AdminLayout>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import AdminLayout from '~/layouts/AdminLayout.vue';
 import axios from 'axios';
 import avatarStudent from '@/assets/images/avatar_student.jpg';
 import avatarTeacher from '@/assets/images/avatar_teacher.jpg';
 import { useToast } from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
+import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
 const route = useRoute()
 const toast = useToast();
+import * as z from 'zod';
 
 let userData = ref({
     email: '',
@@ -131,32 +142,117 @@ let userData = ref({
     DOB: '',
     role: 0,
     address: '',
+    Department: '',
+    Majors: ''
 });
+
+const schema = z.object({
+    name: z.string().min(1, "Name is required"),
+    email: z.string().email("Invalid email").min(1, "Email is required"),
+    phoneNumber: z.string().min(1, "Phone number is required"),
+    address: z.string().min(1, "Address is required"),
+});
+type Schema = z.output<typeof schema>;
 
 async function loadData() {
     try {
         const id = route.params.id;
         const response = await axios.get(`http://localhost:5000/api/user/getUserInfor/${id}`);
         userData.value = response.data.userData;
+        state.value = {
+            name: userData.value.name,
+            email: userData.value.email,
+            phoneNumber: userData.value.phoneNumber,
+            address: userData.value.address,
+            role: userData.value.role,
+            department: userData.value.Department,
+            Majors: userData.value.Majors,
+            DOB: formattedDOB.value
+        };
     } catch (error) {
         console.error(error);
     }
 }
 onMounted(loadData);
 
+async function submit(event: FormSubmitEvent<Schema>) {
+    console.log(event.data);
+    try {
+        const response = await axios.post('http://localhost:5000/api/user/logup', event.data);
+        const stateResponse = response.data.status;
+        if (stateResponse) {
+            isOpen.value = false;
+            toast.success("Register account successfully.");
+            loadData();
+        } else {
+            toast.error(response.data.message);
+        }
+    } catch (error) {
+        console.error("Error during form submission:", error);
+        toast.error("An error occurred during form submission.");
+    }
+}
+
 const isOpen = ref(false);
 const isDeleteModalOpen = ref(false);
 
-const roles = ["Admin", "Teacher", "Student"];
+const study = [
+    {
+        department: "CNTT CLC",
+        major: ["KHMT", "HTTT", "MMT"]
+    },
+    {
+        department: "CNTT",
+        major: ["CNTT", "CNTTJapan"]
+    },
+    {
+        department: "Computer and Robotics",
+        major: ["Computer Engineering", "Robotics Engineering"]
+    },
+    {
+        department: "Engineering Physics",
+        major: ["Engineering Physics"]
+    },
+    {
+        department: "Mechanical Engineering",
+        major: ["Mechanical Engineering"]
+    },
+    {
+        department: "Aerospace Engineering",
+        major: ["Aerospace Engineering"]
+    },
+];
+
+const formattedDOB = computed(() => {
+    console.log(userData.value.DOB)
+    const rawDOB = userData.value.DOB;
+    if (rawDOB) {
+        const date = new Date(rawDOB);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    return '';
+});
 
 const state = ref({
-    firstName: undefined,
-    lastName: undefined,
-    email: undefined,
-    class: undefined,
-    password: undefined,
-    confirmPassword: undefined,
-    role: roles[0],
+    name: userData.value.name,
+    email: userData.value.email,
+    phoneNumber: userData.value.phoneNumber,
+    address: userData.value.address,
+    role: userData.value.role,
+    department: userData.value.Department,
+    Majors: userData.value.Majors,
+    DOB: formattedDOB
+});
+console.log(state)
+const departmentOptions = computed(() => study.map(dep => dep.department));
+
+const majorOptions = computed(() => {
+    const selecteddepartment = state.value.department;
+    const selecteddepartmentObj = study.find(dep => dep.department === selecteddepartment);
+    return selecteddepartmentObj ? selecteddepartmentObj.major : [];
 });
 
 const roleText = computed(() => {
@@ -168,18 +264,6 @@ const getAvatarSrc = computed(() => {
     } else {
         return avatarTeacher;
     }
-});
-
-const formattedDOB = computed(() => {
-    const rawDOB = userData.value.DOB;
-    if (rawDOB) {
-        const date = new Date(rawDOB);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-    return '';
 });
 
 function openDeleteModal() {
@@ -209,7 +293,6 @@ async function deleteAccount() {
         toast.error(error);
     }
 }
-
 
 const links = ref([
     { name: 'Account', path: 'admin-users-id', url: `/admin/users/${route.params.id}`, icon: 'material-symbols:person-check-rounded' },

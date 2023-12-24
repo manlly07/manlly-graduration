@@ -185,16 +185,16 @@ const state = ref({
   confirmPassword: undefined,
   role: roles[0],
   department: study[0].department,
-  major: study[0].major[0],
+  Majors: study[0].major[0],
   DOB: undefined
 });
 
 const departmentOptions = computed(() => study.map(dep => dep.department));
 
 const majorOptions = computed(() => {
-  const selectedDepartment = state.value.department;
-  const selectedDepartmentObj = study.find(dep => dep.department === selectedDepartment);
-  return selectedDepartmentObj ? selectedDepartmentObj.major : [];
+  const selecteddepartment = state.value.department;
+  const selecteddepartmentObj = study.find(dep => dep.department === selecteddepartment);
+  return selecteddepartmentObj ? selecteddepartmentObj.major : [];
 });
 
 
@@ -234,7 +234,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
       <UTable :columns="columns" :rows="filteredAndPagedRows" :sort="{ column: 'title' }">
         <template #name-data="{ row }">
           <NuxtLink :to="`/admin/users/${row._id}`">{{ row.name }}</NuxtLink>
-        </template>
+        </template> 
         <template #actions-data="{ row }">
           <UDropdown :items="items(row)">
             <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
@@ -297,8 +297,8 @@ async function submit(event: FormSubmitEvent<Schema>) {
                   <USelect v-model="state.department" :options="departmentOptions" />
                 </UFormGroup>
               </div>
-              <UFormGroup class="mb-4 flex-1" label="User major" name="major">
-                <USelect v-model="state.major" :options="majorOptions" />
+              <UFormGroup class="mb-4 flex-1" label="User major" name="majors">
+                <USelect v-model="state.Majors" :options="majorOptions" />
               </UFormGroup>
               <UButton type="submit"> Submit </UButton>
             </UForm>
