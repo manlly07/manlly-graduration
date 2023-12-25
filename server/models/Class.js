@@ -73,6 +73,10 @@ exports.listUser = async function(classId){
 }
 
 exports.getAll = async function () {
-    const classes = await Class.find();
-    return classes;
+    try{
+        const classes = await Class.find({});
+        return classes;
+    }catch(err){
+        return err
+    }
 }

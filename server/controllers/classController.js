@@ -47,9 +47,7 @@ exports.listUser = async function(req,res){
 
 exports.getAllClass = async function (req, res) {
     try {
-        console.log("hi")
         const classes = await classModel.getAll();
-        console.log(classes)
         return res.status(200).json(classes);
     } catch (e) {
         return res.status(500).json({ message: e });
