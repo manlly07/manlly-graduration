@@ -176,14 +176,15 @@ async function loadData() {
 onMounted(loadData);
 
 async function submit(event: FormSubmitEvent<Schema>) {
-    console.log(event.data);
     try {
-        const response = await axios.post('http://localhost:5000/api/user/logup', event.data);
+        const id = route.params.id;
+        const response = await axios.put(`http://localhost:5000/api/user/updateUser/${id}`, event.data);
         const stateResponse = response.data.status;
         if (stateResponse) {
             isOpen.value = false;
-            toast.success("Register account successfully.");
+            toast.success("Update user successfully.");
             loadData();
+            isOpen.value = false;
         } else {
             toast.error(response.data.message);
         }
@@ -246,7 +247,7 @@ const state = ref({
     Majors: userData.value.Majors,
     DOB: formattedDOB
 });
-console.log(state)
+
 const departmentOptions = computed(() => study.map(dep => dep.department));
 
 const majorOptions = computed(() => {

@@ -18,7 +18,7 @@ exports.create = async function(data){
     }
     const newClass = Class(dataClass)
     await newClass.save()
-    return newClass
+    return newClass  
 }
 
 exports.get = async function(classId){
@@ -70,4 +70,9 @@ exports.listUser = async function(classId){
     }catch(err){
         return err
     }
+}
+
+exports.getAll = async function () {
+    const classes = await Class.find();
+    return classes;
 }

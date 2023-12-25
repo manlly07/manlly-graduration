@@ -37,7 +37,6 @@ exports.addUser = async function(req, res){
 
 exports.listUser = async function(req,res){
     try{
-        debugger
         const classId = req.params.classId
         const users = await classModel.listUser(classId)
         return res.status(200).json(users)
@@ -45,3 +44,14 @@ exports.listUser = async function(req,res){
         return res.status(500).json({message: e})
     }
 }
+
+exports.getAllClass = async function (req, res) {
+    try {
+        console.log("hi")
+        const classes = await classModel.getAll();
+        console.log(classes)
+        return res.status(200).json(classes);
+    } catch (e) {
+        return res.status(500).json({ message: e });
+    }
+};

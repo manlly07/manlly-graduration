@@ -117,8 +117,7 @@ module.exports = {
         try {
             let userId = req.params.id;
             let updatedUser = req.body;
-
-            await User.findByIdAndUpdate(userId, updatedUser);
+            await User.findByIdAndUpdate(userId, updatedUser); 
 
             return res.status(200).json({
                 status: true,

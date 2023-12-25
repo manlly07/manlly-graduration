@@ -9,5 +9,6 @@ api.post("/api/class", use(classController.create))
 api.put("/api/class/:classId", use(classController.addUser))
 
 api.get("/api/class/:classId", use(classController.listUser))
+api.get("/api/class/getAll", use(classController.getAllClass))
 
 module.exports = api

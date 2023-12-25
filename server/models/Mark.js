@@ -14,7 +14,7 @@ exports.schema = Mark
 exports.create = async function(teacherId,mark){
     const data = {
         mark: mark.mark,
-        type: mark.type,
+        type: mark.type, 
         teacherId: teacherId,
         date_created: new Date()
     }

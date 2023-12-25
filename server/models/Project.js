@@ -13,7 +13,7 @@ const Project = mongoose.model('Project', ProjectSchema, 'projects')
 exports.schema = Project
 
 exports.create = async function(userId, project){
-    const data = {
+    const data = { 
         projectName: project.projectName,
         userId: userId,
         description: project.description,
