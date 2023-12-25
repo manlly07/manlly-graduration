@@ -26,9 +26,7 @@ let handleLogin = async (email, password) => {
                 email: email
             });
             if (user) {
-                console.log(password)
                 let checkPassword = await bcrypt.compare(password, user.password);
-                console.log(checkPassword)
                 if (checkPassword) {
                     result.data = user;
                     result.statusCode = 0;

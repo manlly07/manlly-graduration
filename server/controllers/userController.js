@@ -16,9 +16,7 @@ module.exports = {
                     message: "Không được để trống"
                 });
             } else {
-                console.log(req.body)
                 let result = await loginService.handleLogin(email, password);
-                console.log(result)
                 if (result.statusCode == 0) {
                     const { JWT_SECRET_ACCESS_TOKEN, JWT_EXPRIRE_ACCESS_TOKEN } = process.env;
                     return res.status(200).json({
@@ -53,7 +51,8 @@ module.exports = {
                 DOB,
                 address,
                 department,
-                Majors,
+                majors,
+                msv,
                 role
             } = req.body;
 
@@ -87,10 +86,11 @@ module.exports = {
                 password: hashedPassword, 
                 name,
                 phoneNumber,
-                DOB,
+                DOB: new Date(DOB),
                 address,
-                Department: department,
-                Majors: Majors,
+                department,
+                majors,
+                msv,
                 role,
                 date_created: new Date()
             });
@@ -101,11 +101,11 @@ module.exports = {
             return res.status(200).json({
                 status: true,
                 message: "Đăng ký thành công",
+                data: req.body,
                 token: jwt.sign({ _id: newUser._id, email: newUser.email, password: newUser.password, role: newUser.role },
                     JWT_SECRET_ACCESS_TOKEN, { expiresIn: JWT_EXPRIRE_ACCESS_TOKEN })
             });
         } catch (error) {
-            console.log(error)
             return res.status(500).json({
                 status: false,
                 message: error.message

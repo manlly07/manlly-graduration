@@ -4,9 +4,9 @@ const classController = require('../controllers/classController')
 const use = require('../helper/utility').use
 const authMiddleware = require('../middleware/authMiddleware')
 
-api.post("/api/class", use(classController.create))
+api.post("/api/class", authMiddleware.protectAdmin, use(classController.create))
 
-api.put("/api/class/:classId", use(classController.addUser))
+api.put("/api/class/:classId", authMiddleware.protectAdmin, use(classController.addUser))
 
 api.get("/api/class/:classId", use(classController.listUser))
 
