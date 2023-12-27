@@ -6,7 +6,7 @@
 export default {
   name: 'App',
   created() {
-  if (typeof localStorage !== 'undefined') {
+  if (typeof localStorage !== 'undefined') { 
     this.checkAuthentication();
   } else {
     console.error('localStorage is not available.');
@@ -22,7 +22,7 @@ export default {
         // Nếu có token, kiểm tra vai trò từ token và điều hướng đến trang tương ứng
         const role = this.parseToken(token).role;
         if (role === 0) {
-          this.$router.push('/student');
+          this.$router.push('/student/class');
         } else if (role === 1) {
           this.$router.push('/teacher');
         } else if (role === 2) {

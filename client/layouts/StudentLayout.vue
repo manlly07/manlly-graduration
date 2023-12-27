@@ -3,7 +3,7 @@
         <div class="grid grid-cols-12 w-full lg:gap-5 m-auto">
             <div class="col-span-3">
                 <div class="sticky top-0">
-                    <SidebarAdmin />
+                    <SidebarStudent />
                 </div>
             </div>
             <div class="col-span-9 pr-4">
