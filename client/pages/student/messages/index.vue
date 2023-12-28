@@ -1,5 +1,5 @@
 <template>
-    <AdminLayout>
+    <StudentLayout>
         <div class="flex border shadow-md">
             <div class="w-1/3 border-r">
                 <div class="header flex gap-4 items-center h-14 border-b px-4 mb-4">
@@ -75,11 +75,11 @@
                 </div>
             </div>
         </div>
-    </AdminLayout>
+    </StudentLayout>
 </template>
 
 <script setup>
-import AdminLayout from '~/layouts/AdminLayout.vue';
+import StudentLayout from '~/layouts/StudentLayout.vue';
 
 
 </script>
