@@ -6,6 +6,10 @@ const port = process.env.PORT || 5000;
 const routers = require("./routes")
 const connectDB = require('./config/database');
 const errorMiddleware = require('./middleware/errorMiddleware')
+const { log } = require('console')
+const multer = require('multer');
+
+
 
 
 dotenv.config();
@@ -15,8 +19,7 @@ app.use(
   express.urlencoded({
     extended: true, 
   })
-  );
-  
+  );  
 connectDB();
 // mongoose
 //   .connect(process.env.MONGO_URL)
@@ -26,7 +29,7 @@ connectDB();
 //   .catch((err) => {
 //     console.log(err);
 //   });
-
+app.use('/uploads', express.static('uploads'));
 app.use(routers);
 
 // error handling

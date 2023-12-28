@@ -14,5 +14,6 @@ api.put('/api/project/:projectId', authMiddleware.protectStudent, use(projectCon
 
 api.delete('/api/project/:projectId', authMiddleware.protectStudent, use(projectController.deleteProject))
 
+api.post('/api/project/uploadfile/:projectId', use(projectController.uploadFile))
 
 module.exports = api
