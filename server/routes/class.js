@@ -12,4 +12,4 @@ api.get("/api/class/:classId", use(classController.listUser))
 
 api.get("/api/class", use(classController.getAllClass))
 
-module.exports = api
+module.exports = api 

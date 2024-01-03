@@ -24,7 +24,7 @@ exports.create = async function(req, res){
     }
 }
 
-exports.addUser = async function(req, res){
+exports.addUser = async function(req, res){ 
     try{
         const data = req.body
         const classId = req.params.classId

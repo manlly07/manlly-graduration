@@ -10,7 +10,7 @@
             src="https://static.vecteezy.com/system/resources/previews/009/385/472/non_2x/school-desk-clipart-design-illustration-free-png.png"
             class="w-full object-cover mb-4 block" />
           <div class="font-semibold">{{ classItem.className }}</div>
-          <div>{{ classItem.listUser.length }} students</div>
+          <div>{{ classItem.listUser.length - 1 }} students</div>
         </NuxtLink>
       </template>
     </div>
@@ -23,7 +23,7 @@
         <template #header>
           <div class="flex items-center justify-between">
             <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-              Add a new user
+              Add a new class
             </h3>
             <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
               @click="isOpen = false" />
@@ -32,32 +32,16 @@
 
         <UForm :schema="schema" :state="state" @submit="submit">
           <div class="flex gap-4">
-            <UFormGroup class="mb-4 flex-1" label="First Name" name="firstName">
-              <UInput v-model="state.firstName" placeholder="First Name" />
+            <UFormGroup class="mb-4 flex-1" label="Class Name" name="className">
+              <UInput v-model="state.className" placeholder="Class Name" />
             </UFormGroup>
-            <UFormGroup class="mb-4 flex-1" label="Last Name" name="lastName">
-              <UInput v-model="state.lastName" placeholder="Last Name" />
+            <UFormGroup class="mb-4 flex-1" label="Teacher" name="teacher">
+              <USelect v-model="state.teacher" :options="teacher" />
             </UFormGroup>
           </div>
-          <UFormGroup class="mb-4 flex-1" label="Email" name="email">
-            <UInput v-model="state.email" placeholder="Email" />
+          <UFormGroup class="mb-4 flex-1" label="Students" name="listUser">
+            <UInput v-model="state.listUser" placeholder="Student" />
           </UFormGroup>
-          <div class="flex gap-4">
-            <UFormGroup class="mb-4 flex-1" label="Password" name="password">
-              <UInput v-model="state.password" type="password" placeholder="Enter your password" />
-            </UFormGroup>
-            <UFormGroup class="mb-4 flex-1" label="Confirm Password" name="confirmPassword">
-              <UInput v-model="state.password" type="password" placeholder="Enter your confirm password" />
-            </UFormGroup>
-          </div>
-          <div class="flex gap-4">
-            <UFormGroup class="mb-4 flex-1" label="User role" name="role">
-              <USelect v-model="state.role" :options="roles" />
-            </UFormGroup>
-            <UFormGroup class="mb-4 flex-1" label="User role" name="role">
-              <USelect v-model="state.role" :options="roles" />
-            </UFormGroup>
-          </div>
           <UButton type="submit"> Submit </UButton>
         </UForm>
       </UCard>
@@ -67,10 +51,11 @@
 
 <script setup lang="ts">
 import AdminLayout from '../layouts/AdminLayout.vue';
-// @ts-ignore
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
 import axios from 'axios';
+import { useToast } from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
 
 const isOpen = ref(false);
 interface ClassItem {
@@ -81,25 +66,27 @@ interface ClassItem {
 const schema = z.object({
   email: z.string().email("Invalid email"),
   password: z.string().min(8, "Must be at least 8 characters"),
+  listUser: z.array(z.string()),  // Adjust the validation for listUser
 });
+
 type Schema = z.output<typeof schema>;
 
-const roles = ["Admin", "Teacher", "User"];
+let teacher: string[] = [];
+
 const classes = ref<ClassItem[]>([]);
+
 const state = ref({
-  firstName: undefined,
-  lastName: undefined,
-  email: undefined,
-  class: undefined,
-  password: undefined,
-  confirmPassword: undefined,
-  role: roles[0],
+  className: undefined,
+  listUser: [] as string[],
+  teacher: undefined
 });
 
 async function loadData() {
   try {
-    const response = await axios.get("http://localhost:5000/api/class");
-    classes.value = response.data;
+    const response_class = await axios.get("http://localhost:5000/api/class");
+    classes.value = response_class.data;
+    const response_people = await axios.get("http://localhost:5000/api/user/getAllTeacherAndStudent");
+    console.log(response_people.data)
   } catch (error) {
     console.error(error);
   }
