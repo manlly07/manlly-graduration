@@ -36,11 +36,11 @@
               <UInput v-model="state.className" placeholder="Class Name" />
             </UFormGroup>
             <UFormGroup class="mb-4 flex-1" label="Teacher" name="teacher">
-              <USelect v-model="state.teacher" :options="teacher" />
+              <USelect v-model="state.teacher" :options="teacher.map(t => ({ label: t.name, value: t._id }))" />
             </UFormGroup>
           </div>
           <UFormGroup class="mb-4 flex-1" label="Students" name="listUser">
-            <UInput v-model="state.listUser" placeholder="Student" />
+            <UInput v-model="state.listUser"  placeholder="Student" />
           </UFormGroup>
           <UButton type="submit"> Submit </UButton>
         </UForm>
@@ -56,17 +56,22 @@ import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
 import axios from 'axios';
 import { useToast } from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
+import vSelect from 'vue-select';
 
 const isOpen = ref(false);
+const teacherSearch = ref('');
+const showResults = ref(false);
+const searchResults = ref([]);
+const selectedTeacher = ref(null);
+
 interface ClassItem {
   _id: string;
   className: string;
   listUser: string[];
 }
+
 const schema = z.object({
-  email: z.string().email("Invalid email"),
-  password: z.string().min(8, "Must be at least 8 characters"),
-  listUser: z.array(z.string()),  // Adjust the validation for listUser
+  listUser: z.array(z.string()),
 });
 
 type Schema = z.output<typeof schema>;
@@ -86,15 +91,26 @@ async function loadData() {
     const response_class = await axios.get("http://localhost:5000/api/class");
     classes.value = response_class.data;
     const response_people = await axios.get("http://localhost:5000/api/user/getAllTeacherAndStudent");
-    console.log(response_people.data)
+    const userData = response_people.data.userData;
+
+    teacher = userData
+      .filter(user => user.role === 1)
+      .map(teacher => ({ _id: teacher._id, name: teacher.name }));
+
+    console.log(teacher);
   } catch (error) {
     console.error(error);
   }
 }
 
 onMounted(loadData);
+
 async function submit(event: FormSubmitEvent<Schema>) {
   // Do something with data
   console.log(event.data);
+}
+
+function onSelectTeacher(value) {
+  state.teacher = value ? value._id : null;
 }
 </script>

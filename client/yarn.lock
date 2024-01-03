@@ -225,10 +225,10 @@
     "chalk" "^2.4.2"
     "js-tokens" "^4.0.0"
 
-"@babel/parser@^7.22.14", "@babel/parser@^7.22.15", "@babel/parser@^7.22.16", "@babel/parser@^7.22.7", "@babel/parser@^7.23.0":
-  "integrity" "sha512-vvPKKdMemU85V9WE/l5wZEmImpCtLqbnTvqDS2U1fJ96KrxoW7KrXhNsNCblQlg8Ck4b85yxdTyelsMUgFUXiw=="
-  "resolved" "https://registry.npmjs.org/@babel/parser/-/parser-7.23.0.tgz"
-  "version" "7.23.0"
+"@babel/parser@^7.22.14", "@babel/parser@^7.22.15", "@babel/parser@^7.22.16", "@babel/parser@^7.22.7", "@babel/parser@^7.23.0", "@babel/parser@^7.23.5":
+  "integrity" "sha512-Z2uID7YJ7oNvAI20O9X0bblw7Qqs8Q2hFy0R9tAfnfLkp5MW0UH9eUvnDSnFwKZ0AvgS1ucqR4KzvVHgnke1VQ=="
+  "resolved" "https://registry.npmjs.org/@babel/parser/-/parser-7.23.6.tgz"
+  "version" "7.23.6"
 
 "@babel/plugin-proposal-decorators@^7.23.0":
   "integrity" "sha512-eR0gJQc830fJVGz37oKLvt9W9uUIQSAovUl0e9sJ3YeO09dlcoBVYD3CLrjCj4qHdXmfiyTyFt8yeQYSN5fxLg=="
@@ -1191,6 +1191,13 @@
   "resolved" "https://registry.npmjs.org/@types/resolve/-/resolve-1.20.2.tgz"
   "version" "1.20.2"
 
+"@types/vue-select@^3.16.8":
+  "integrity" "sha512-ZBovlBrWf/wnPqCmMw24ryIC7ghQLfIBmkl1qssqBGONdx7yOmi/GLwtPxll/6UwXWGNWMeokleOgVAZPis+Ag=="
+  "resolved" "https://registry.npmjs.org/@types/vue-select/-/vue-select-3.16.8.tgz"
+  "version" "3.16.8"
+  dependencies:
+    "vue" "^2.0.0"
+
 "@types/web-bluetooth@^0.0.18":
   "integrity" "sha512-v/ZHEj9xh82usl8LMR3GarzFY1IrbXJw5L4QfQhokjRV91q+SelFqxQWSep1ucXEZ22+dSTwLFkXeur25sPIbw=="
   "resolved" "https://registry.npmjs.org/@types/web-bluetooth/-/web-bluetooth-0.0.18.tgz"
@@ -1333,6 +1340,17 @@
     "magic-string" "^0.30.5"
     "postcss" "^8.4.31"
     "source-map-js" "^1.0.2"
+
+"@vue/compiler-sfc@2.7.16":
+  "integrity" "sha512-KWhJ9k5nXuNtygPU7+t1rX6baZeqOYLEforUPjgNDBnLicfHCoi48H87Q8XyLZOrNNsmhuwKqtpDQWjEFe6Ekg=="
+  "resolved" "https://registry.npmjs.org/@vue/compiler-sfc/-/compiler-sfc-2.7.16.tgz"
+  "version" "2.7.16"
+  dependencies:
+    "@babel/parser" "^7.23.5"
+    "postcss" "^8.4.14"
+    "source-map" "^0.6.1"
+  optionalDependencies:
+    "prettier" "^1.18.2 || ^2.0.0"
 
 "@vue/compiler-ssr@3.3.6":
   "integrity" "sha512-QTIHAfDCHhjXlYGkUg5KH7YwYtdUM1vcFl/FxFDlD6d0nXAmnjizka3HITp8DGudzHndv2PjKVS44vqqy0vP4w=="
@@ -2464,7 +2482,7 @@
   dependencies:
     "css-tree" "~2.2.0"
 
-"csstype@^3.1.2":
+"csstype@^3.1.0", "csstype@^3.1.2":
   "integrity" "sha512-I7K1Uu0MBPzaFKg4nI5Q7Vs2t+3gWWW648spaF+Rg7pI9ds18Ugn+lvg4SHczUdKlHI5LWBXyqfS8+DufyBsgQ=="
   "resolved" "https://registry.npmjs.org/csstype/-/csstype-3.1.2.tgz"
   "version" "3.1.2"
@@ -5528,7 +5546,7 @@
   "resolved" "https://registry.npmjs.org/postcss-value-parser/-/postcss-value-parser-4.2.0.tgz"
   "version" "4.2.0"
 
-"postcss@^7.0.0 || ^8.0.1", "postcss@^8.0.0", "postcss@^8.0.9", "postcss@^8.1.0", "postcss@^8.1.10", "postcss@^8.2.14", "postcss@^8.2.15", "postcss@^8.2.2", "postcss@^8.4", "postcss@^8.4.21", "postcss@^8.4.23", "postcss@^8.4.27", "postcss@^8.4.31", "postcss@>=8.0.9":
+"postcss@^7.0.0 || ^8.0.1", "postcss@^8.0.0", "postcss@^8.0.9", "postcss@^8.1.0", "postcss@^8.1.10", "postcss@^8.2.14", "postcss@^8.2.15", "postcss@^8.2.2", "postcss@^8.4", "postcss@^8.4.14", "postcss@^8.4.21", "postcss@^8.4.23", "postcss@^8.4.27", "postcss@^8.4.31", "postcss@>=8.0.9":
   "integrity" "sha512-PS08Iboia9mts/2ygV3eLpY5ghnUcfLV/EXTOW1E2qYxJKGGBUtNjN76FYHnMs36RmARn41bC0AZmn+rR0OVpQ=="
   "resolved" "https://registry.npmjs.org/postcss/-/postcss-8.4.31.tgz"
   "version" "8.4.31"
@@ -5536,6 +5554,11 @@
     "nanoid" "^3.3.6"
     "picocolors" "^1.0.0"
     "source-map-js" "^1.0.2"
+
+"prettier@^1.18.2 || ^2.0.0":
+  "integrity" "sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q=="
+  "resolved" "https://registry.npmjs.org/prettier/-/prettier-2.8.8.tgz"
+  "version" "2.8.8"
 
 "pretty-bytes@^6.1.1":
   "integrity" "sha512-mQUvGU6aUFQ+rNvTIAcZuWGRT9a6f6Yrg9bHs4ImKF+HZCEK+plBvnAZYSIQztknZF2qnzNtr6F8s0+IuptdlQ=="
@@ -6038,6 +6061,11 @@
     "source-map" "^0.6.0"
 
 "source-map@^0.6.0":
+  "integrity" "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g=="
+  "resolved" "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz"
+  "version" "0.6.1"
+
+"source-map@^0.6.1":
   "integrity" "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g=="
   "resolved" "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz"
   "version" "0.6.1"
@@ -6815,12 +6843,25 @@
   dependencies:
     "@vue/devtools-api" "^6.5.0"
 
+"vue-select@^4.0.0-beta.6":
+  "integrity" "sha512-K+zrNBSpwMPhAxYLTCl56gaMrWZGgayoWCLqe5rWwkB8aUbAUh7u6sXjIR7v4ckp2WKC7zEEUY27g6h1MRsIHw=="
+  "resolved" "https://registry.npmjs.org/vue-select/-/vue-select-4.0.0-beta.6.tgz"
+  "version" "4.0.0-beta.6"
+
 "vue-toast-notification@^3.1.2":
   "integrity" "sha512-oNRL/W9aaHoeScp+iTIW7k09vM16/+8aptp2maa+7qTB43JuxmAgKdXKFYtf+uvSNOYYq2BIWgLCeJ61pwom/A=="
   "resolved" "https://registry.npmjs.org/vue-toast-notification/-/vue-toast-notification-3.1.2.tgz"
   "version" "3.1.2"
 
-"vue@^2.7.0 || ^3.2.25", "vue@^3.0", "vue@^3.0.0", "vue@^3.0.0-0 || ^2.6.0", "vue@^3.2.0", "vue@^3.2.25", "vue@^3.3.4", "vue@^3.3.6", "vue@>= 3", "vue@>=2.7 || >=3", "vue@>=3", "vue@3.3.6":
+"vue@^2.0.0":
+  "integrity" "sha512-4gCtFXaAA3zYZdTp5s4Hl2sozuySsgz4jy1EnpBHNfpMa9dK1ZCG7viqBPCwXtmgc8nHqUsAu3G4gtmXkkY3Sw=="
+  "resolved" "https://registry.npmjs.org/vue/-/vue-2.7.16.tgz"
+  "version" "2.7.16"
+  dependencies:
+    "@vue/compiler-sfc" "2.7.16"
+    "csstype" "^3.1.0"
+
+"vue@^2.7.0 || ^3.2.25", "vue@^3.0", "vue@^3.0.0", "vue@^3.0.0-0 || ^2.6.0", "vue@^3.2.0", "vue@^3.2.25", "vue@^3.3.4", "vue@^3.3.6", "vue@>= 3", "vue@>=2.7 || >=3", "vue@>=3", "vue@3.3.6", "vue@3.x":
   "integrity" "sha512-jJIDETeWJnoY+gfn4ZtMPMS5KtbP4ax+CT4dcQFhTnWEk8xMupFyQ0JxL28nvT/M4+p4a0ptxaV2WY0LiIxvRg=="
   "resolved" "https://registry.npmjs.org/vue/-/vue-3.3.6.tgz"
   "version" "3.3.6"
