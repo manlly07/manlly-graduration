@@ -40,7 +40,8 @@
             </UFormGroup>
           </div>
           <UFormGroup class="mb-4 flex-1" label="Students" name="listUser">
-            <UInput v-model="state.listUser"  placeholder="Student" />
+            <Select v-model:value="state.listUser" :options="studentOptions.map(t => ({ label: t.email, value: t._id }))"
+              mode="tags" placeholder="Please select" class="w-100"></Select>
           </UFormGroup>
           <UButton type="submit"> Submit </UButton>
         </UForm>
@@ -56,14 +57,14 @@ import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
 import axios from 'axios';
 import { useToast } from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
-import vSelect from 'vue-select';
+import { ref } from 'vue';
+import { Select } from 'ant-design-vue'
+
+let student = ref([]);
+let studentOptions = ref([]);
 
 const isOpen = ref(false);
-const teacherSearch = ref('');
-const showResults = ref(false);
-const searchResults = ref([]);
-const selectedTeacher = ref(null);
-
+const toast = useToast();
 interface ClassItem {
   _id: string;
   className: string;
@@ -97,7 +98,9 @@ async function loadData() {
       .filter(user => user.role === 1)
       .map(teacher => ({ _id: teacher._id, name: teacher.name }));
 
-    console.log(teacher);
+    studentOptions = userData
+      .filter(user => user.role === 0)
+      .map(student => ({ _id: student._id, email: student.email }));
   } catch (error) {
     console.error(error);
   }
@@ -106,11 +109,27 @@ async function loadData() {
 onMounted(loadData);
 
 async function submit(event: FormSubmitEvent<Schema>) {
-  // Do something with data
-  console.log(event.data);
-}
+  if (!event.data.className || !event.data.listUser || event.data.listUser.length === 0) {
+    toast.error("Please fill in all required fields.");
+  } else {
+    state._rawValue.listUser.push(event.data.teacher);
+    delete state._rawValue.teacher;
+    try {
+      const response = await axios.post('http://localhost:5000/api/class', state._rawValue);
+      const stateResponse = response.data;
+      console.log(stateResponse);
+      if (stateResponse) {
+        isOpen.value = false;
+        toast.success("Register class successfully.");
+        loadData();
+      } else {
+        toast.error("Error occurred!");
+      }
+    } catch (error) {
+      console.error("Error during form submission:", error);
+      toast.error("An error occurred during form submission.");
+    }
+  }
 
-function onSelectTeacher(value) {
-  state.teacher = value ? value._id : null;
 }
 </script>
