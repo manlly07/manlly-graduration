@@ -3,7 +3,8 @@
         <div class="mt-12 flex gap-8">
             <div class="flex-1 border flex flex-col h-fit">
                 <div class="pt-12 px-8 text-center flex justify-center flex-col w-full items-center">
-                    <img src="https://static.vecteezy.com/system/resources/previews/009/385/472/non_2x/school-desk-clipart-design-illustration-free-png.png" alt="" class="h-24 w-24 object-cover" />
+                    <img src="https://static.vecteezy.com/system/resources/previews/009/385/472/non_2x/school-desk-clipart-design-illustration-free-png.png"
+                        alt="" class="h-24 w-24 object-cover" />
 
                     <h3 class="font-semibold text-lg text-black my-2">{{ teacherInfo.name }}</h3>
                     <div class="p-2 text-center bg-[#f2f2f3] text-[#a8aaae] w-fit text-xs">Teacher</div>
@@ -51,9 +52,60 @@
                         </NuxtLink>
                     </template>
                 </div>
-                <NuxtPage /> 
+                <NuxtPage />
             </div>
         </div>
+        <template>
+            <div>
+                <UModal v-model="isOpen" prevent-close>
+                    <UCard :ui="{
+                        ring: '',
+                        divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+                    }">
+                        <template #header>
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                                    Update information of class
+                                </h3>
+                                <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                                    @click="isOpen = false" />
+                            </div>
+                        </template>
+
+                        <UForm :state="state" @submit="submit">
+                            <div class="flex gap-4">
+                                <UFormGroup class="mb-4 flex-1" label="Class Name" name="className">
+                                    <UInput v-model="detailClass.className" placeholder="Class Name" />
+                                </UFormGroup>
+                                <UFormGroup class="mb-4 flex-1" label="Teacher" name="teacher">
+                                    <USelect v-model="teacherInfo.name"
+                                        :options="teacher.map(t => ({ label: t.name, value: t._id }))" />
+                                </UFormGroup>
+                            </div>
+                            <!-- <UFormGroup class="mb-4 flex-1" label="Students" name="listUser">
+                                <Select v-model:value="state.listUser"
+                                    :options="studentOptions.map(t => ({ label: t.email, value: t._id }))" mode="tags"
+                                    placeholder="Please select" class="w-100"></Select>
+                            </UFormGroup> -->
+                            <UButton type="submit"> Submit </UButton>
+                        </UForm>
+                    </UCard>
+                </UModal>
+            </div>
+        </template>
+        <template>
+            <UModal v-model="isDeleteModalOpen" prevent-close>
+                <UCard>
+                    <div class="text-center p-6">
+                        <h3 class="text-lg font-semibold mb-4">Do you want to delete this class?</h3>
+                        <div class="flex justify-center gap-4">
+                            <UButton color="red" variant="solid" @click="deleteAccount">Accept</UButton>
+                            <UButton color="gray" variant="ghost" @click="closeDeleteModal">Cancel</UButton>
+                        </div>
+                    </div>
+                </UCard>
+            </UModal>
+        </template>
     </AdminLayout>
 </template> 
 
@@ -67,6 +119,14 @@ import * as z from 'zod';
 
 const route = useRoute()
 const toast = useToast();
+const isDeleteModalOpen = ref(false);
+const isOpen = ref(false);
+
+const schema = z.object({
+    listUser: z.array(z.string()),
+});
+
+type Schema = z.output<typeof schema>;
 
 const teacherInfo = ref({
     email: '',
@@ -79,34 +139,84 @@ const teacherInfo = ref({
     Majors: ''
 });
 
+let teacher: string[] = [];
+let studentOptions = ref([]);
+
+let detailClass = ref({
+    className: '',
+    listUser: []
+});
+
+const state = ref({
+    className: detailClass.value.className,
+    teacher: teacherInfo.value.name,
+    listStudent: []
+})
 async function loadData() {
-  try {
-    const id = route.params.id;
-    const response = await axios.get(`http://localhost:5000/api/class/${id}`);
-    teacherInfo.value = response.data.find((user: { role: number; }) => user.role === 1);
-    console.log(teacherInfo.value)
-  } catch (error) {
-    console.error(error);
-  }
+    try {
+        const id = route.params.id;
+        const response = await axios.get(`http://localhost:5000/api/class/${id}`);
+        teacherInfo.value = response.data.find((user: { role: number; }) => user.role === 1);
+
+        const response_detail = await axios.get(`http://localhost:5000/api/class/getDetail/${id}`);
+        detailClass.value = response_detail.data
+
+        const response_people = await axios.get("http://localhost:5000/api/user/getAllTeacherAndStudent");
+        const userData = response_people.data.userData;
+
+        teacher = userData
+            .filter(user => user.role === 1)
+            .map(teacher => ({ _id: teacher._id, name: teacher.name }));
+
+        studentOptions = userData
+            .filter(user => user.role === 0)
+            .map(student => ({ _id: student._id, email: student.email }));
+    } catch (error) {
+        console.error(error);
+    }
 }
 
 onMounted(loadData);
 
-const formattedDOB = computed(() => {
-    console.log(teacherInfo.value.DOB)
-    const rawDOB = teacherInfo.value.DOB;
-    if (rawDOB) {
-        const date = new Date(rawDOB);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
+async function submit(event: FormSubmitEvent<Schema>) {
+    try {
+        const id = route.params.id;
+    } catch (error) {
+        console.error("Error during form submission:", error);
+        toast.error("An error occurred during form submission.");
     }
-    return '';
-});
+}
+
+function openDeleteModal() {
+    isDeleteModalOpen.value = true;
+}
+
+function closeDeleteModal() {
+    isDeleteModalOpen.value = false;
+}
+
+async function deleteAccount() {
+    const router = useRouter();
+    try {
+        const id = route.params.id;
+        const response = await axios.delete(`http://localhost:5000/api/class/${id}`);
+
+        closeDeleteModal();
+
+        if (response.status === 200 && response.data) {
+            toast.success("Delete successfully.");
+            router.push('/admin/class');
+        } else {
+            toast.error("An error occurred while deleting.");
+        }
+    } catch (error) {
+        console.error(error);
+        toast.error(error);
+    }
+}
 
 const links = ref([
-  { name: 'Students', path: 'admin-class-id', url: `/admin/class/${route.params.id}`, icon: 'material-symbols:person-check-rounded' },
+    { name: 'Students', path: 'admin-class-id', url: `/admin/class/${route.params.id}`, icon: 'material-symbols:person-check-rounded' },
 ]);
 </script>
  

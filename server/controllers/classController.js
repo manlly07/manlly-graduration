@@ -53,3 +53,23 @@ exports.getAllClass = async function (req, res) {
         return res.status(500).json({ message: e });
     }
 };
+
+exports.deleteClass = async function (req, res) { 
+    try {
+        const classId = req.params.classId;
+        const result = await classModel.delete(classId);
+        return res.status(200).json(result)
+    } catch (e) {
+        return res.status(500).json({ message: e });
+    }
+}
+
+exports.getDetail = async function (req, res)  {
+    try {
+        const classId = req.params.classId;
+        const result = await classModel.get(classId);
+        return res.status(200).json(result)
+    } catch (e) {
+        return res.status(500).json({ message: e });
+    }
+}

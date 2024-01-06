@@ -10,6 +10,9 @@ api.put("/api/class/:classId", use(classController.addUser))
 
 api.get("/api/class/:classId", use(classController.listUser))
 
+api.get("/api/class/getDetail/:classId", use(classController.getDetail))
+
 api.get("/api/class", use(classController.getAllClass))
 
+api.delete("/api/class/:classId", use(classController.deleteClass))
 module.exports = api 
