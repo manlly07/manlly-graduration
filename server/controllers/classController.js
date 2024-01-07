@@ -73,3 +73,14 @@ exports.getDetail = async function (req, res)  {
         return res.status(500).json({ message: e });
     }
 }
+
+exports.update = async function (req, res) {
+    try {
+        const classId = req.params.classId;
+        const data = req.body;
+        const result = await classModel.update(classId, data);
+        return res.status(200).json(result)
+    } catch (e) {
+        return res.status(500).json({ message: e });
+    }
+}

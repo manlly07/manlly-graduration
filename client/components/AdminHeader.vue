@@ -34,7 +34,7 @@ const router = useRouter();
 const items = [
   [
     {
-      label: "ben@example.com",
+      label: process.client ? localStorage.getItem('email') : '',
       slot: "account",
       disabled: true,
     },
@@ -44,7 +44,9 @@ const items = [
       label: "Sign out",
       icon: "i-heroicons-arrow-left-on-rectangle",
       click: () => {
-        localStorage.setItem('token', '');
+        if (process.client) {
+          localStorage.setItem('token', '');
+        }
         router.push('/login')
       }
     },

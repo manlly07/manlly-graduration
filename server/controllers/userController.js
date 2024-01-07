@@ -11,7 +11,7 @@ module.exports = {
             let password = req.body.password;
 
             if (!email || !password) {
-                return res.status(400).json({
+                return res.status(200).json({
                     status: false,
                     message: "Không được để trống"
                 });
@@ -29,7 +29,7 @@ module.exports = {
                             JWT_SECRET_ACCESS_TOKEN, { expiresIn: JWT_EXPRIRE_ACCESS_TOKEN })
                     });
                 } else {
-                    return res.status(404).json({
+                    return res.status(200).json({
                         statusCode: result.statusCode,
                         message: result.message,
                     });

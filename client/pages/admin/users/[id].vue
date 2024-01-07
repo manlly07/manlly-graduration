@@ -181,7 +181,6 @@ async function submit(event: FormSubmitEvent<Schema>) {
         const response = await axios.put(`http://localhost:5000/api/user/updateUser/${id}`, event.data);
         const stateResponse = response.data.status;
         if (stateResponse) {
-            isOpen.value = false;
             toast.success("Update user successfully.");
             loadData();
             isOpen.value = false;

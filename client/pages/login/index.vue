@@ -22,12 +22,15 @@
 
 <script>
 import axios from 'axios';
+import { useToast } from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
+const toast = useToast();
 
 export default {
     name: "login",
     data() {
         return {
-            email: '', 
+            email: '',
             password: '',
             showPassword: false,
         }
@@ -39,13 +42,18 @@ export default {
                     email: this.email,
                     password: this.password,
                 });
-
                 const statusCode = response.data.statusCode;
-                const token = response.data.token;
                 if (statusCode === 0) {
+                    const token = response.data.token;
+                    const _id = response.data.data._id;
+                    const email = response.data.data.email;
+
                     localStorage.setItem('token', token);
+                    localStorage.setItem('_id', _id);
+                    localStorage.setItem('email', email);
+                    toast.success("Đăng nhập thành công")
                     if (response.data.data.role === 0) {
-                        await this.$router.push('/student');
+                        await this.$router.push('/student/class');
                     } else if (response.data.data.role === 1) {
                         await this.$router.push('/teacher');
                     }
@@ -53,9 +61,11 @@ export default {
                         await this.$router.push('/admin/users');
                     }
                 } else {
+                    toast.error(response.data.message)
                     console.log(response.data.message);
                 }
             } catch (error) {
+                toast.error(error.message)
                 console.error(error);
             }
         },

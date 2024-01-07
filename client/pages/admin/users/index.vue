@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// @ts-ignore
 import { ref, onMounted, computed } from 'vue';
 import * as z from 'zod';
 import AdminLayout from "~/layouts/AdminLayout.vue";
@@ -44,7 +43,7 @@ const columns = [
 
 const people = ref<any[]>([]);
 
-async function loadData() {
+async function loadData() { 
   try {
     const response = await axios.get('http://localhost:5000/api/user/getAllTeacherAndStudent');
     people.value = response.data.userData;
@@ -107,6 +106,7 @@ async function exportToCsv() {
     console.error(error);
   }
 }
+
 const table = ref({
   q: "",
   page: 1,

@@ -5,6 +5,7 @@ const ProjectSchema = new Schema({
     projectName: {type: String, required: true},
     userId: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     description: {type: String, required: true},
+    isApproved: {type: Boolean, default: false},
     listMark: [{type: mongoose.Schema.Types.ObjectId, ref: 'Mark'}],
     date_created: Date
 })
@@ -13,12 +14,12 @@ const Project = mongoose.model('Project', ProjectSchema, 'projects')
 exports.schema = Project
 
 exports.create = async function(userId, project){
-    const data = { 
+    const data = {
         projectName: project.projectName,
         userId: userId,
         description: project.description,
         date_created: new Date()
-    }
+    } 
     const newProject = Project(data)
     await newProject.save()
     return newProject

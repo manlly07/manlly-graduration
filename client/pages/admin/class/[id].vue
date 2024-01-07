@@ -75,18 +75,18 @@
                         <UForm :state="state" @submit="submit">
                             <div class="flex gap-4">
                                 <UFormGroup class="mb-4 flex-1" label="Class Name" name="className">
-                                    <UInput v-model="detailClass.className" placeholder="Class Name" />
+                                    <UInput v-model="state.className" placeholder="Class Name" />
                                 </UFormGroup>
                                 <UFormGroup class="mb-4 flex-1" label="Teacher" name="teacher">
-                                    <USelect v-model="teacherInfo.name"
-                                        :options="teacher.map(t => ({ label: t.name, value: t._id }))" />
+                                    <Select v-model:value="state.teacher" class="w-80"
+                                        :options="teacher.map(t => ({ label: t.name, value: t._id }))"></Select>
                                 </UFormGroup>
                             </div>
-                            <!-- <UFormGroup class="mb-4 flex-1" label="Students" name="listUser">
+                            <UFormGroup class="mb-4 flex-1" label="Students" name="listUser">
                                 <Select v-model:value="state.listUser"
                                     :options="studentOptions.map(t => ({ label: t.email, value: t._id }))" mode="tags"
                                     placeholder="Please select" class="w-100"></Select>
-                            </UFormGroup> -->
+                            </UFormGroup>
                             <UButton type="submit"> Submit </UButton>
                         </UForm>
                     </UCard>
@@ -116,6 +116,7 @@ import { useToast } from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
 import * as z from 'zod';
+import { Select } from 'ant-design-vue'
 
 const route = useRoute()
 const toast = useToast();
@@ -129,6 +130,7 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 
 const teacherInfo = ref({
+    _id: '',
     email: '',
     name: '',
     phoneNumber: '',
@@ -148,9 +150,9 @@ let detailClass = ref({
 });
 
 const state = ref({
-    className: detailClass.value.className,
-    teacher: teacherInfo.value.name,
-    listStudent: []
+    className: '',
+    teacher: undefined,
+    listStudent: undefined
 })
 async function loadData() {
     try {
@@ -171,6 +173,14 @@ async function loadData() {
         studentOptions = userData
             .filter(user => user.role === 0)
             .map(student => ({ _id: student._id, email: student.email }));
+
+        state.value = {
+            className: detailClass.value.className,
+            teacher: teacher.find(t => t.name === teacherInfo.value.name)?._id,
+            listUser: response.data
+                .filter(user => user.role === 0)
+                .map(t => t._id),
+        };
     } catch (error) {
         console.error(error);
     }
@@ -179,13 +189,40 @@ async function loadData() {
 onMounted(loadData);
 
 async function submit(event: FormSubmitEvent<Schema>) {
-    try {
-        const id = route.params.id;
-    } catch (error) {
-        console.error("Error during form submission:", error);
-        toast.error("An error occurred during form submission.");
+    if (!event.data.className || !event.data.listUser || event.data.listUser.length === 0 || !event.data.teacher) {
+        toast.error("Please fill in all required fields.");
+    } else {
+        try {
+            state._rawValue.listUser.push(event.data.teacher);
+            delete state._rawValue.teacher;
+            const id = route.params.id;
+
+            const response = await axios.put(`http://localhost:5000/api/class/${id}`, state._rawValue);
+            if (response.data) {
+                toast.success("Update user successfully.");
+                loadData();
+                isOpen.value = false;
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            console.error("Error during form submission:", error);
+            toast.error("An error occurred during form submission.");
+        }
     }
 }
+
+const formattedDOB = computed(() => {
+    const rawDOB = teacherInfo.value.DOB;
+    if (rawDOB) {
+        const date = new Date(rawDOB);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    return '';
+});
 
 function openDeleteModal() {
     isDeleteModalOpen.value = true;
@@ -211,7 +248,7 @@ async function deleteAccount() {
         }
     } catch (error) {
         console.error(error);
-        toast.error(error);
+        toast.error(error.message);
     }
 }
 

@@ -7,7 +7,7 @@
             src="https://static.vecteezy.com/system/resources/previews/009/385/472/non_2x/school-desk-clipart-design-illustration-free-png.png"
             class="w-full object-cover mb-4 block" />
           <div class="font-semibold">{{ classItem.className }}</div>
-          <div>{{ classItem.listUser.length }} students</div>
+          <div>{{ classItem.listUser.length - 1}} students</div>
         </NuxtLink>
       </template>
     </div>
@@ -16,7 +16,6 @@
   
 <script setup lang="ts">
 import StudentLayout from '../../../layouts/StudentLayout.vue';
-// @ts-ignore
 import * as z from "zod";
 import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
 import axios from 'axios';
@@ -42,13 +41,15 @@ const state = ref({
   class: undefined,
   password: undefined,
   confirmPassword: undefined,
-  role: roles[0],
+  role: roles[0], 
 });
 
 async function loadData() {
   try {
     const response = await axios.get("http://localhost:5000/api/class");
-    classes.value = response.data;
+    const userId = localStorage.getItem('_id');
+
+    classes.value = response.data.filter(classItem => classItem.listUser.includes(userId));
   } catch (error) {
     console.error(error);
   }
