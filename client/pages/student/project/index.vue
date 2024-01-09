@@ -8,10 +8,7 @@
                 <UButton color="primary" variant="solid" label="Upload project" icon="i-heroicons-pencil-square"
                     @click="isOpen = true" />
             </div>
-            <UTable :columns="columns" :rows="filteredAndPagedRows" :sort="{ column: 'title' }">
-                <template #name-data="{ row }">
-                    <NuxtLink :to="`/admin/users/${row._id}`">{{ row.name }}</NuxtLink>
-                </template>
+            <UTable :columns="columns" :rows="filteredAndPagedRows" :sort="{ column: 'projectName' }">
             </UTable>
             <div class="flex justify-end mt-4">
                 <UPagination v-model="table.page" :page-count="pageCount" :total="totalCount" />
@@ -45,12 +42,11 @@
                                 </UFormGroup>
                             </div>
                             <div class="flex gap-4">
-                                <UFormGroup class="mb-4 flex-1" label="File" name="file">
-                                    <Upload v-model:file-list="fileList" name="file"
-                                        :headers="headers"
+                                <UFormGroup class="mb-4 flex-1" label="File">
+                                    <Upload v-model:file-list="fileList" name="file" :headers="headers"
                                         @change="handleChange">
                                         <Button>
-                                            <UploadOutlined></UploadOutlined> 
+                                            <UploadOutlined></UploadOutlined>
                                             Click to Upload
                                         </Button>
                                     </Upload>
@@ -92,11 +88,21 @@ const columns = [
         sortable: true,
     },
     {
+        key: "date_created",
+        label: "Date created",
+        sortable: true,
+    },
+    {
         key: "isApproved",
         label: "State",
         sortable: true,
         direction: "desc",
+        formatter: (value) => {
+            console.log("isApproved value:", value);
+            return value ? 'Đã xét duyệt' : 'Đang xét duyệt';
+        },
     }
+
 ];
 
 const project = ref<any[]>([]);
@@ -114,9 +120,22 @@ type Schema = z.output<typeof schema>;
 
 async function loadData() {
     try {
+        const userId = localStorage.getItem('_id');
+        const token = localStorage.getItem('token');
+
+        const headers = {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        };
         const id = localStorage.getItem('_id')
-        const response = await axios.get(`http://localhost:5000/api/project/${id}`)
+        const response = await axios.get(`http://localhost:5000/api/project/${id}`, { headers })
         project.value = response.data
+        project.value = response.data.map((item) => {
+            return {
+                ...item,
+                isApproved: item.isApproved ? 'Đã xét duyệt' : 'Chưa được xét duyệt'
+            };
+        });
     } catch (error) {
         console.error(error);
     }
@@ -126,23 +145,47 @@ onMounted(loadData);
 
 async function submit(event: FormSubmitEvent<Schema>) {
     console.log(event.data);
-    try {
-        const userId = localStorage.getItem('_id');
-        const token = localStorage.getItem('token');
+    console.log(fileList)
+    if (fileList.value.length === 0) {
+        toast.error("Please upload your file")
+    } else if(fileList.value.length > 1) {
+        toast.error("Only upload 1 file")
+    } else {
+        try {
+            const userId = localStorage.getItem('_id');
+            const token = localStorage.getItem('token');
 
-        const headers = {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        };
+            const headers = {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            };
 
-        const response = await axios.post(`http://localhost:5000/api/project/${userId}`, event.data, { headers });
-        console.log(response.data)
+            const response = await axios.post(`http://localhost:5000/api/project/${userId}`, event.data, { headers });
+            const response_create_project = response.data._id;
+            const formData = new FormData();
 
-        toast.success('Create project successfully.')
-    } catch (error) {
-        console.error("Error during form submission:", error);
-        toast.error("An error occurred during form submission.");
+            formData.append('file', fileList[0]);
+            console.log(formData)
+            const response_upload = await axios.post(`http://localhost:5000/api/upload/${response_create_project}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            const response_upload_file = response_upload.data;
+            if( response_upload_file) {
+                isOpen.value = false;
+                loadData();
+                toast.success('Create project successfully.')
+            } else {
+                toast.error('Create project fail!')
+            }
+            
+        } catch (error) {
+            console.error("Error during form submission:", error);
+            toast.error("An error occurred during form submission.");
+        }
     }
+
 }
 
 const handleChange = (info: UploadChangeParam) => {

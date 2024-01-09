@@ -4,8 +4,9 @@ const uploadModel = require('../models/Upload');
 class UploadController {
   async uploadFile(req, res) {
     try {
+      console.log(req.params.projectId, req.file)
         const projectId = req.params.projectId
-        const file = req.file;
+        const file = req.file; 
         const result = await uploadModel.uploadFile(file, projectId);
         res.status(200).json(result);
     } catch (error) {
@@ -13,7 +14,7 @@ class UploadController {
         res.status(500).json({ error: 'Internal Server Error' });
     }
   }
-
+ 
   async getFilesByProjectId(req, res) {
     try {
       const projectId = req.params.projectId;
