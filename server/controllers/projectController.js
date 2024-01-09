@@ -6,10 +6,10 @@ exports.addProject = async function(req, res){
     utility.validate(data, ['projectName', 'description'])
     const userId = req.params.userId
 
-    const checkQuantity = await projectModel.get(userId)
-    if (checkQuantity.length === 2) {
-        return res.status(404).json({message: 'bad request'})
-    }
+    // const checkQuantity = await projectModel.getCountProject(userId)
+    // if (checkQuantity.length === 2) {
+    //     return res.status(404).json({message: 'bad request'})
+    // }
 
     const newProject = await projectModel.create(userId, data)
     if(!newProject){
@@ -25,7 +25,6 @@ exports.listProject = async function(req, res){
         return res.status(401).json({message: "not found"})
     }
     return res.status(200).json(projects)
-
 }
 
 exports.getProject = async function(req, res){

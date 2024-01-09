@@ -50,7 +50,7 @@
                                         :headers="headers"
                                         @change="handleChange">
                                         <Button>
-                                            <UploadOutlined></UploadOutlined>
+                                            <UploadOutlined></UploadOutlined> 
                                             Click to Upload
                                         </Button>
                                     </Upload>
@@ -103,7 +103,6 @@ const project = ref<any[]>([]);
 
 const state = ref({
     projectName: undefined,
-    userId: undefined,
     description: undefined,
 })
 
@@ -117,7 +116,6 @@ async function loadData() {
     try {
         const id = localStorage.getItem('_id')
         const response = await axios.get(`http://localhost:5000/api/project/${id}`)
-        console.log(response.data)
         project.value = response.data
     } catch (error) {
         console.error(error);
@@ -129,7 +127,18 @@ onMounted(loadData);
 async function submit(event: FormSubmitEvent<Schema>) {
     console.log(event.data);
     try {
+        const userId = localStorage.getItem('_id');
+        const token = localStorage.getItem('token');
 
+        const headers = {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        };
+
+        const response = await axios.post(`http://localhost:5000/api/project/${userId}`, event.data, { headers });
+        console.log(response.data)
+
+        toast.success('Create project successfully.')
     } catch (error) {
         console.error("Error during form submission:", error);
         toast.error("An error occurred during form submission.");

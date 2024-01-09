@@ -34,6 +34,15 @@ exports.get = async function(userId, projectId){
     return projects
 }
 
+exports.getCountProject = async function(userId){
+    try {
+        const count = await Project.countDocuments({ userId: userId });
+        return count;
+    } catch (error) {
+        throw error;
+    }
+}
+
 exports.update = async function(projecyId,data){
     try{
         const project = await Project.findByIdAndUpdate(projecyId, data)
@@ -76,7 +85,6 @@ exports.listMark = async function(projectId){
         return err
     }
 }
-
 
 const { Storage } = require('@google-cloud/storage');
 
