@@ -62,3 +62,21 @@ exports.deleteProject = async function(req, res){
         return res.status(404).json({msg: 'error', data: err})
     }
 }
+
+
+// exports.uploadFile = async function(req, res){
+//     const projectId = req.params.projectId
+//     const data = req.body
+//     debugger
+//     try{    
+//         const url = new URL(data.fileURL);
+//         const fileName = url.pathname.split('/').pop(); // Lấy phần cuối cùng sau khi tách theo dấu '/'
+//         const [name, extension] = fileName.split('.'); // Tách tên và định dạng theo dấu '.'    
+//         let newFileName = `${name}_${Date.now()}_${projectId}.${extension}`;
+
+//         const outPutFile = await projectModel.uploadFile(process.env.BUCKET_NAME, '../uploads/test.txt', newFileName);
+//         return res.json(outPutFile)
+//     }catch(err){
+//         return res.status(404).json({msg: 'error', data: err})
+//     }
+// }

@@ -8,9 +8,10 @@ const UserSchema = new mongoose.Schema({
   DOB: { type: Date },
   address: {type: String},
   // Khoa
-  Department: {type: String},
+  department: {type: String},
   //Ngành
-  Majors: {type: String},
+  majors: {type: String},
+  msv: {type: String},
   role: { type: Number, enum: [0, 1, 2], default: 0},
   date_created: Date
 }); 
