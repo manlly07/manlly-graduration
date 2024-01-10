@@ -163,8 +163,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
             const response = await axios.post(`http://localhost:5000/api/project/${userId}`, event.data, { headers });
             const response_create_project = response.data._id;
             const formData = new FormData();
-
-            formData.append('file', fileList[0]);
+            formData.append('file', fileList.value[0]);
             console.log(formData)
             const response_upload = await axios.post(`http://localhost:5000/api/upload/${response_create_project}`, formData, {
                 headers: {

@@ -4,9 +4,10 @@ const uploadModel = require('../models/Upload');
 class UploadController {
   async uploadFile(req, res) {
     try {
-      console.log(req.params.projectId, req.file)
+      debugger
+      console.log(req.params.projectId, req?.body?.file)
         const projectId = req.params.projectId
-        const file = req.file; 
+        const file = req.body?.file; 
         const result = await uploadModel.uploadFile(file, projectId);
         res.status(200).json(result);
     } catch (error) {
