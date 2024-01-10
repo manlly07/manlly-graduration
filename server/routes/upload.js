@@ -12,5 +12,7 @@ api.post("/api/upload/:projectId", upload.single('file'), use(uploadController.u
 
 api.get("/api/upload/:projectId", use(uploadController.getFilesByProjectId))
 
+api.delete("/api/upload/:projectId", use(uploadController.deleteFilesByProjectId))
+
 
 module.exports = api
