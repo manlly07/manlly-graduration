@@ -9,7 +9,11 @@
                     @click="isOpen = true" />
             </div>
             <UTable :columns="columns" :rows="filteredAndPagedRows" :sort="{ column: 'projectName' }">
+                <template #projectName-data="{ row }">
+                    <NuxtLink :to="`/student/project/${row._id}`">{{ row.projectName }}</NuxtLink>
+                </template>
             </UTable>
+
             <div class="flex justify-end mt-4">
                 <UPagination v-model="table.page" :page-count="pageCount" :total="totalCount" />
             </div>
@@ -51,6 +55,7 @@
                                         </Button>
                                     </Upload>
                                 </UFormGroup>
+
                             </div>
                             <UButton type="submit"> Submit </UButton>
                         </UForm>
@@ -77,6 +82,11 @@ const toast = useToast();
 const isOpen = ref(false);
 
 const columns = [
+    {
+        key: "_id",
+        label: "ID",
+        sortable: true,
+    },
     {
         key: "projectName",
         label: "Name",
@@ -148,7 +158,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
     console.log(fileList)
     if (fileList.value.length === 0) {
         toast.error("Please upload your file")
-    } else if(fileList.value.length > 1) {
+    } else if (fileList.value.length > 1) {
         toast.error("Only upload 1 file")
     } else {
         try {
@@ -160,25 +170,25 @@ async function submit(event: FormSubmitEvent<Schema>) {
                 'Content-Type': 'application/json',
             };
 
+            const formData = new FormData();
+            formData.append('file', fileList.value[0]?.originFileObj);
             const response = await axios.post(`http://localhost:5000/api/project/${userId}`, event.data, { headers });
             const response_create_project = response.data._id;
-            const formData = new FormData();
-            formData.append('file', fileList.value[0]);
-            console.log(formData)
+
             const response_upload = await axios.post(`http://localhost:5000/api/upload/${response_create_project}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
             const response_upload_file = response_upload.data;
-            if( response_upload_file) {
+            if (response_upload_file) {
                 isOpen.value = false;
                 loadData();
                 toast.success('Create project successfully.')
             } else {
                 toast.error('Create project fail!')
             }
-            
+
         } catch (error) {
             console.error("Error during form submission:", error);
             toast.error("An error occurred during form submission.");
@@ -224,7 +234,6 @@ const filteredAndPagedRows = computed(() => {
         (table.value.page - 1) * pageCount,
         table.value.page * pageCount
     );
-    console.log(pagedRows);
     return pagedRows;
 });
 
