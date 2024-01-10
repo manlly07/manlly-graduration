@@ -4,7 +4,7 @@ const userModel = require('../models/User')
 exports.protectStudent = async function(req, res, next){
     const { JWT_SECRET_ACCESS_TOKEN} = process.env;
     let token
-    if (
+    if ( 
         req.headers.authorization &&
         req.headers.authorization.startsWith('Bearer')
     ) {

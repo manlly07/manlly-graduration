@@ -10,7 +10,6 @@ const ClassSchema = new Schema({
 const Class = mongoose.model('Class', ClassSchema, 'classes')
 exports.schema = Class
 
-
 exports.create = async function(data){
     const dataClass = {
         className : data.className,

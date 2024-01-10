@@ -9,6 +9,7 @@ const storage = new Storage({ projectId, keyFilename });
 
 class UploadModel {
   async uploadFile(file, projectId) {
+    console.log(file)
     const bucket = storage.bucket(bucketName);
     const fileName = `${projectId}_${Date.now()}_${file.originalname}`;
     const fileUpload = bucket.file(fileName);

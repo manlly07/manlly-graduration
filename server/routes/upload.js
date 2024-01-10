@@ -12,5 +12,4 @@ api.post("/api/upload/:projectId", upload.single('file'), use(uploadController.u
 
 api.get("/api/upload/:projectId", use(uploadController.getFilesByProjectId))
 
-
 module.exports = api

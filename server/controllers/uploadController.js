@@ -1,22 +1,13 @@
 
-
-// Use an immediately-invoked function expression (IIFE) to call the uploadFile function
-// (async () => {
-//     // Call the uploadFile function with the specified parameters
-//     const ret = await uploadFile(process.env.BUCKET_NAME, 'test.txt', 'outputTest.txt');
-
-//     // Log the result of the upload operation to the console
-//     console.log(ret);
-// })();
-
-// controllers/fileController.js
 const uploadModel = require('../models/Upload');
 
 class UploadController {
   async uploadFile(req, res) {
     try {
+      debugger
+      console.log(req.params.projectId, req?.body?.file)
         const projectId = req.params.projectId
-        const file = req.file;
+        const file = req.body?.file; 
         const result = await uploadModel.uploadFile(file, projectId);
         res.status(200).json(result);
     } catch (error) {
@@ -24,7 +15,7 @@ class UploadController {
         res.status(500).json({ error: 'Internal Server Error' });
     }
   }
-
+ 
   async getFilesByProjectId(req, res) {
     try {
       const projectId = req.params.projectId;
