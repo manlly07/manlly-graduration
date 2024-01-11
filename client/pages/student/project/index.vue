@@ -83,11 +83,6 @@ const isOpen = ref(false);
 
 const columns = [
     {
-        key: "_id",
-        label: "ID",
-        sortable: true,
-    },
-    {
         key: "projectName",
         label: "Name",
         sortable: true,
@@ -154,47 +149,62 @@ async function loadData() {
 onMounted(loadData);
 
 async function submit(event: FormSubmitEvent<Schema>) {
-    console.log(event.data);
-    console.log(fileList)
-    if (fileList.value.length === 0) {
-        toast.error("Please upload your file")
-    } else if (fileList.value.length > 1) {
-        toast.error("Only upload 1 file")
-    } else {
-        try {
-            const userId = localStorage.getItem('_id');
-            const token = localStorage.getItem('token');
+    let projectId;
 
-            const headers = {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            };
-
-            const formData = new FormData();
-            formData.append('file', fileList.value[0]?.originFileObj);
-            const response = await axios.post(`http://localhost:5000/api/project/${userId}`, event.data, { headers });
-            const response_create_project = response.data._id;
-
-            const response_upload = await axios.post(`http://localhost:5000/api/upload/${response_create_project}`, formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                },
-            });
-            const response_upload_file = response_upload.data;
-            if (response_upload_file) {
-                isOpen.value = false;
-                loadData();
-                toast.success('Create project successfully.')
-            } else {
-                toast.error('Create project fail!')
-            }
-
-        } catch (error) {
-            console.error("Error during form submission:", error);
-            toast.error("An error occurred during form submission.");
+    try {
+        if (fileList.value.length === 0) {
+            toast.error("Please upload your file");
+            return;
         }
-    }
 
+        if (fileList.value.length > 1) {
+            toast.error("Only upload 1 file");
+            return;
+        }
+
+        const userId = localStorage.getItem('_id');
+        const token = localStorage.getItem('token');
+
+        const headers = {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        };
+
+        const formData = new FormData();
+        formData.append('file', fileList.value[0]?.originFileObj);
+
+        // Step 1: Create the project
+        const createProjectResponse = await axios.post(`http://localhost:5000/api/project/${userId}`, event.data, { headers });
+        projectId = createProjectResponse.data._id;
+
+        // Step 2: Upload file
+        const uploadFileResponse = await axios.post(`http://localhost:5000/api/upload/${projectId}`, formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+
+        if (uploadFileResponse.data) {
+            // Success: File uploaded and project created
+            loadData();
+            toast.success('Create project successfully.');
+        } else {
+            // Failure: Delete the project
+            await axios.delete(`http://localhost:5000/api/project/${projectId}`, { headers });
+            toast.error('Create project fail!');
+        }
+
+        isOpen.value = false;
+
+    } catch (error) {
+        // An error occurred during project creation or file upload
+        if (projectId) {
+            // If project creation was successful before the error, delete the project
+            await axios.delete(`http://localhost:5000/api/project/${projectId}`, { headers });
+        }
+        console.error("Error during form submission:", error);
+        toast.error("Create project fail");
+    }
 }
 
 const handleChange = (info: UploadChangeParam) => {

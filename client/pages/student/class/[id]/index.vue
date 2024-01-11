@@ -21,11 +21,9 @@
             </div>
         </div>
     </div>
-    <!-- </div> -->
 </template>
 
 <script setup lang="ts">
-import StudentLayout from '../../../../layouts/AdminLayout.vue';
 import axios from 'axios';
 const route = useRoute()
 

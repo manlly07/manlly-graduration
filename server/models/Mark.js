@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
 const MarkSchema = new Schema({
-    mark: {type: Number, required: true},
+    mark: {type: Number, required: true, default: 0},
     type: { type: Number, enum: [0, 1, 2], required: true},
     teacherId : {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     date_created: Date

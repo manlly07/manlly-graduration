@@ -31,7 +31,7 @@ exports.listProject = async function(req, res){
 
 exports.getProject = async function(req, res){
     const userId = req.params.userId
-    const projectId = req.params.projectId
+    const projectId = req.params.projectId 
 
     const project = await projectModel.get(userId, projectId)
     if(!project){
