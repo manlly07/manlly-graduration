@@ -176,7 +176,6 @@ async function loadData() {
         const response_detail = await axios.get(`http://localhost:5000/api/class/getDetail/${id}`);
         detailClass.value = response_detail.data
         teacherInfo.value = detailClass.value.teacherId;
-        console.log(detailClass, teacherInfo)
 
         const response_people = await axios.get("http://localhost:5000/api/user/getAllTeacherAndStudent");
         const userData = response_people.data.userData;
@@ -196,9 +195,10 @@ async function loadData() {
         state.value = {
             className: detailClass.value.className,
             teacherId: teacher.find(t => t.name === teacherInfo.value.name)?._id,
-            listUser: detailClass.value.listUser.map(t => ({ label: t.email, value: t._id })),
-            examinationBoard: detailClass.value.examinationBoard.map(t => ({ label: t.name, value: t._id }))
+            listUser: detailClass.value.listUser.map(t => t._id),
+            examinationBoard: detailClass.value.examinationBoard.map(t => t._id)
         };
+        console.log(state.value)
     } catch (error) {
         console.error(error);
     }
@@ -207,15 +207,14 @@ async function loadData() {
 onMounted(loadData);
 
 async function submit(event: FormSubmitEvent<Schema>) {
-    if (!event.data.className || !event.data.listUser || event.data.listUser.length === 0 || !event.data.teacher) {
+    console.log(event.data)
+    if (!event.data.className || !event.data.listUser || event.data.listUser.length === 0 || !event.data.teacherId) {
         toast.error("Please fill in all required fields.");
     } else {
         try {
-            state._rawValue.listUser.push(event.data.teacher);
-            delete state._rawValue.teacher;
             const id = route.params.id;
 
-            const response = await axios.put(`http://localhost:5000/api/class/${id}`, state._rawValue, { headers });
+            const response = await axios.put(`http://localhost:5000/api/class/${id}`, event.data, { headers });
             if (response.data) {
                 toast.success("Update user successfully.");
                 loadData();

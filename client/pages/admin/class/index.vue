@@ -10,7 +10,7 @@
             src="https://static.vecteezy.com/system/resources/previews/009/385/472/non_2x/school-desk-clipart-design-illustration-free-png.png"
             class="w-full object-cover mb-4 block" />
           <div class="font-semibold">{{ classItem.className }}</div>
-          <div>{{ classItem.listUser.length - 1 }} students</div>
+          <div>{{ classItem.listUser.length }} students</div>
         </NuxtLink>
       </template>
     </div>
