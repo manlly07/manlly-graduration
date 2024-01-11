@@ -32,7 +32,7 @@ class UploadModel {
 
     return {
       fileName,
-      fileUrl: `https://storage.cloud.google.com/${bucketName}/${fileName}`,
+      fileUrl: `https://storage.googleapis.com/${bucketName}/${fileName}`,
     };
   }
 
@@ -47,10 +47,34 @@ class UploadModel {
       })
       .map(file => ({
         fileName: file.name,
-        fileUrl: `https://storage.cloud.google.com/${bucketName}/${file.name}`,
+        fileUrl: `https://storage.googleapis.com/${bucketName}/${file.name}`,
       }));
 
     return fileList;
+  }
+
+  async deleteFilesByProjectId(projectId) {
+    const bucket = storage.bucket(bucketName);
+
+    const [files] = await bucket.getFiles();
+    const filesToDelete = files
+      .filter(file => {
+        const regex = new RegExp(`^${projectId}_[0-9]+_`);
+        return regex.test(file.name);
+      })
+      .map(file => file.name);
+
+    const check = await Promise.all(filesToDelete.map(async fileName => {
+      try {
+        await bucket.file(fileName).delete();
+        return {
+          msg: 'Delete sucessful'
+        }
+      } catch (error) {
+        return error
+      }
+    }));
+    return check
   }
 }
 
