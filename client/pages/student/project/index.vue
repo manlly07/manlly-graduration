@@ -101,11 +101,7 @@ const columns = [
         key: "isApproved",
         label: "State",
         sortable: true,
-        direction: "desc",
-        formatter: (value) => {
-            console.log("isApproved value:", value);
-            return value ? 'Đã xét duyệt' : 'Đang xét duyệt';
-        },
+        direction: "desc"
     }
 
 ];

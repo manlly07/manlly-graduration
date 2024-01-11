@@ -1,7 +1,6 @@
 const classModel = require('../models/Class')
 const utility = require('../helper/utility')
-
-
+const Class = require('../models/Class')
 exports.create = async function(req, res){
     try{
         const data = req.body
@@ -64,12 +63,13 @@ exports.deleteClass = async function (req, res) {
     }
 }
 
-exports.getDetail = async function (req, res)  {
+exports.getDetail = async function (req, res) {
     try {
         const classId = req.params.classId;
-        const result = await classModel.get(classId);
-        return res.status(200).json(result)
+        const result = await classModel.getDetail(classId)
+        return res.status(200).json(result);
     } catch (e) {
+        console.log(e)
         return res.status(500).json({ message: e });
     }
 }

@@ -35,13 +35,18 @@
             <UFormGroup class="mb-4 flex-1" label="Class Name" name="className">
               <UInput v-model="state.className" placeholder="Class Name" />
             </UFormGroup>
-            <UFormGroup class="mb-4 flex-1" label="Teacher" name="teacher">
-              <USelect v-model="state.teacher" :options="teacher.map(t => ({ label: t.name, value: t._id }))" />
+            <UFormGroup class="mb-4 flex-1" label="Teacher" name="teacherId">
+              <USelect v-model="state.teacherId" :options="teacher.map(t => ({ label: t.name, value: t._id }))" />
             </UFormGroup>
           </div>
           <UFormGroup class="mb-4 flex-1" label="Students" name="listUser">
             <Select v-model:value="state.listUser" :options="studentOptions.map(t => ({ label: t.email, value: t._id }))"
               mode="tags" placeholder="Please select" class="w-100"></Select>
+          </UFormGroup>
+          <UFormGroup class="mb-4 flex-1" label="Examination Board" name="examinationBoard">
+            <Select v-model:value="state.examinationBoard"
+              :options="examination.map(t => ({ label: t.name, value: t._id }))" mode="tags" placeholder="Please select"
+              class="w-100"></Select>
           </UFormGroup>
           <UButton type="submit"> Submit </UButton>
         </UForm>
@@ -61,30 +66,44 @@ import { ref } from 'vue';
 import { Select } from 'ant-design-vue'
 
 let student = ref([]);
-let studentOptions = ref([]); 
+let studentOptions = ref([]);
 
 const isOpen = ref(false);
 const toast = useToast();
+
+const token = process.client ? localStorage.getItem('token') : '';
+
+const headers = {
+  Authorization: `Bearer ${token}`,
+  'Content-Type': 'application/json',
+};
+
 interface ClassItem {
   _id: string;
   className: string;
+  teacherId: string;
   listUser: string[];
+  examinationBoard: string[];
 }
 
 const schema = z.object({
   listUser: z.array(z.string()),
+  examinationBoard: z.array(z.string())
 });
 
 type Schema = z.output<typeof schema>;
 
 let teacher: string[] = [];
 
+let examination: string[] = [];
+
 const classes = ref<ClassItem[]>([]);
 
 const state = ref({
   className: undefined,
   listUser: [] as string[],
-  teacher: undefined
+  teacherId: undefined,
+  examinationBoard: [] as string[],
 });
 
 async function loadData() {
@@ -95,6 +114,10 @@ async function loadData() {
     const userData = response_people.data.userData;
 
     teacher = userData
+      .filter(user => user.role === 1)
+      .map(teacher => ({ _id: teacher._id, name: teacher.name }));
+
+    examination = userData
       .filter(user => user.role === 1)
       .map(teacher => ({ _id: teacher._id, name: teacher.name }));
 
@@ -109,15 +132,13 @@ async function loadData() {
 onMounted(loadData);
 
 async function submit(event: FormSubmitEvent<Schema>) {
-  if (!event.data.className || !event.data.listUser || event.data.listUser.length === 0) {
+  console.log(event.data)
+  if (!event.data.className || !event.data.teacherId || event.data.listUser.length === 0) {
     toast.error("Please fill in all required fields.");
   } else {
-    state._rawValue.listUser.push(event.data.teacher);
-    delete state._rawValue.teacher;
     try {
-      const response = await axios.post('http://localhost:5000/api/class', state._rawValue);
+      const response = await axios.post('http://localhost:5000/api/class', event.data, { headers });
       const stateResponse = response.data;
-      console.log(stateResponse);
       if (stateResponse) {
         isOpen.value = false;
         toast.success("Register class successfully.");

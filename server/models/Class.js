@@ -3,7 +3,9 @@ const Schema = mongoose.Schema
 
 const ClassSchema = new Schema({
     className: { type: String, required: true },
+    teacherId: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     listUser: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+    examinationBoard: [{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     date_created: Date
 })
 
@@ -13,7 +15,9 @@ exports.schema = Class
 exports.create = async function(data){
     const dataClass = {
         className : data.className,
-        listUser : data.listUser || []
+        listUser : data.listUser || [],
+        teacherId : data.teacherId,
+        examinationBoard : data.examinationBoard || []
     }
     const newClass = Class(dataClass)
     await newClass.save()
@@ -23,6 +27,19 @@ exports.create = async function(data){
 exports.get = async function(classId){
     if(classId){
         const classData = await Class.findById(classId).exec()
+        return classData
+    }else{
+        const classes = await Class.find()
+        return classes
+    }
+}
+
+exports.getDetail = async function(classId){
+    if(classId){
+        const classData = await Class.findById(classId)
+        .populate('teacherId')
+        .populate('listUser')
+        .populate('examinationBoard');
         return classData
     }else{
         const classes = await Class.find()

@@ -4,58 +4,49 @@
         <div v-if="file && file.fileUrl">
             <template v-if="isPDF(file.fileName)">
                 <!-- Hiển thị PDF -->
-                <iframe :src="file.fileUrl" width="100%" height="600px" frameborder="0"></iframe>
+                <iframe :src="file.fileUrl" width="100%" height="500px" frameborder="0"></iframe>
             </template>
             <template v-else-if="isWordDoc(file.fileName)">
-                <!-- Hiển thị file Word -->
-                <div v-html="wordContent"></div>
+                <!-- Hiển thị tên file và biểu tượng của Google Docs -->
+                <a :href="file.fileUrl" download="file.fileName">
+                    <button class="btn btn-primary" style="font-size: 16px">
+                        <span class="icon-text">
+                            <FileTextOutlined />
+                            <span class="ml-2">{{ getShortFileName(file.fileName) }}</span>
+                        </span>
+                    </button>
+                </a>
             </template>
             <template v-else>
-                <!-- Hiển thị thông báo nếu không hỗ trợ định dạng -->
                 <p>This file format is not supported.</p>
             </template>
         </div>
     </div>
 </template>
+  
+<style>
+.icon-text {
+    display: flex;
+    align-items: center;
+}
 
+.ml-2 {
+    margin-left: 0.5rem;
+}
+</style>
+  
 <script setup lang="ts">
 import axios from 'axios';
-import mammoth from 'mammoth';
 const route = useRoute()
-
+import { FileTextOutlined } from '@ant-design/icons-vue';
+import { Button } from 'ant-design-vue';
 const file = ref<any>();
-const wordContent = ref<string | null>(null);
 
 async function loadData() {
     try {
         const id = route.params.id;
         const response = await axios.get(`http://localhost:5000/api/upload/${id}`);
         file.value = response.data[0];
-
-        if (isWordDoc(file.value.fileName)) {
-            await loadWordContent();
-        }
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-async function loadWordContent() {
-    try {
-        debugger
-        console.log(file.value.fileUrl)
-        const response = await axios.get(file.value.fileUrl);
-
-        const arrayBuffer = response.data;
-        const buffer = Buffer.from(arrayBuffer, 'binary').toString('base64');
-
-        mammoth.extractRawText({ arrayBuffer: arrayBuffer })
-            .then((result) => {
-                wordContent.value = result.value;
-            })
-            .catch((error) => {
-                console.error(error);
-            });
     } catch (error) {
         console.error(error);
     }
@@ -67,6 +58,14 @@ function isPDF(fileName: string): boolean {
 
 function isWordDoc(fileName: string): boolean {
     return fileName.toLowerCase().endsWith('.doc') || fileName.toLowerCase().endsWith('.docx');
+}
+
+function getShortFileName(fileName: string): string {
+    const maxLength = 20; // Đặt độ dài tối đa cho tên tệp tin rút gọn
+    if (fileName.length <= maxLength) {
+        return fileName;
+    }
+    return fileName.substr(0, maxLength) + '...';
 }
 
 onMounted(loadData);

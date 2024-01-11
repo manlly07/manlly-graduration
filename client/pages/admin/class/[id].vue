@@ -77,14 +77,19 @@
                                 <UFormGroup class="mb-4 flex-1" label="Class Name" name="className">
                                     <UInput v-model="state.className" placeholder="Class Name" />
                                 </UFormGroup>
-                                <UFormGroup class="mb-4 flex-1" label="Teacher" name="teacher">
-                                    <Select v-model:value="state.teacher" class="w-80"
+                                <UFormGroup class="mb-4 flex-1" label="Teacher" name="teacherId">
+                                    <Select v-model:value="state.teacherId" class="w-80"
                                         :options="teacher.map(t => ({ label: t.name, value: t._id }))"></Select>
                                 </UFormGroup>
                             </div>
                             <UFormGroup class="mb-4 flex-1" label="Students" name="listUser">
                                 <Select v-model:value="state.listUser"
                                     :options="studentOptions.map(t => ({ label: t.email, value: t._id }))" mode="tags"
+                                    placeholder="Please select" class="w-100"></Select>
+                            </UFormGroup>
+                            <UFormGroup class="mb-4 flex-1" label="Examination Board" name="examinationBoard">
+                                <Select v-model:value="state.examinationBoard"
+                                    :options="examination.map(t => ({ label: t.name, value: t._id }))" mode="tags"
                                     placeholder="Please select" class="w-100"></Select>
                             </UFormGroup>
                             <UButton type="submit"> Submit </UButton>
@@ -122,6 +127,12 @@ const route = useRoute()
 const toast = useToast();
 const isDeleteModalOpen = ref(false);
 const isOpen = ref(false);
+const token = process.client ? localStorage.getItem('token') : '';
+
+const headers = {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+};
 
 const schema = z.object({
     listUser: z.array(z.string()),
@@ -143,30 +154,38 @@ const teacherInfo = ref({
 
 let teacher: string[] = [];
 let studentOptions = ref([]);
+let examination: string[] = [];
 
 let detailClass = ref({
     className: '',
-    listUser: []
+    teacherId: '',
+    listUser: [],
+    examinationBoard: [],
 });
 
 const state = ref({
-    className: '',
-    teacher: undefined,
-    listStudent: undefined
-})
+    className: undefined,
+    listUser: undefined,
+    teacherId: undefined,
+    examinationBoard: undefined,
+});
 async function loadData() {
     try {
         const id = route.params.id;
-        const response = await axios.get(`http://localhost:5000/api/class/${id}`);
-        teacherInfo.value = response.data.find((user: { role: number; }) => user.role === 1);
 
         const response_detail = await axios.get(`http://localhost:5000/api/class/getDetail/${id}`);
         detailClass.value = response_detail.data
+        teacherInfo.value = detailClass.value.teacherId;
+        console.log(detailClass, teacherInfo)
 
         const response_people = await axios.get("http://localhost:5000/api/user/getAllTeacherAndStudent");
         const userData = response_people.data.userData;
 
         teacher = userData
+            .filter(user => user.role === 1)
+            .map(teacher => ({ _id: teacher._id, name: teacher.name }));
+
+        examination = userData
             .filter(user => user.role === 1)
             .map(teacher => ({ _id: teacher._id, name: teacher.name }));
 
@@ -176,10 +195,9 @@ async function loadData() {
 
         state.value = {
             className: detailClass.value.className,
-            teacher: teacher.find(t => t.name === teacherInfo.value.name)?._id,
-            listUser: response.data
-                .filter(user => user.role === 0)
-                .map(t => t._id),
+            teacherId: teacher.find(t => t.name === teacherInfo.value.name)?._id,
+            listUser: detailClass.value.listUser.map(t => ({ label: t.email, value: t._id })),
+            examinationBoard: detailClass.value.examinationBoard.map(t => ({ label: t.name, value: t._id }))
         };
     } catch (error) {
         console.error(error);
@@ -197,7 +215,7 @@ async function submit(event: FormSubmitEvent<Schema>) {
             delete state._rawValue.teacher;
             const id = route.params.id;
 
-            const response = await axios.put(`http://localhost:5000/api/class/${id}`, state._rawValue);
+            const response = await axios.put(`http://localhost:5000/api/class/${id}`, state._rawValue, { headers });
             if (response.data) {
                 toast.success("Update user successfully.");
                 loadData();

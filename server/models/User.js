@@ -7,7 +7,7 @@ const UserSchema = new mongoose.Schema({
   phoneNumber: { type: String },
   DOB: { type: Date },
   address: {type: String},
-  // Khoa
+  // Khoa 
   department: {type: String},
   //Ngành
   majors: {type: String},
