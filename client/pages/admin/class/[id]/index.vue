@@ -40,11 +40,9 @@
             </div>
         </div>
     </div>
-    <!-- </div> -->
 </template>
 
 <script setup lang="ts">
-import AdminLayout from '../layouts/AdminLayout.vue';
 import axios from 'axios';
 const route = useRoute()
 

@@ -6,7 +6,7 @@ const authMiddleware = require('../middleware/authMiddleware')
 
 api.post("/api/project/:userId", authMiddleware.protectStudent, use(projectController.addProject))
 
-api.get('/api/project/:userId', authMiddleware.protectStudent, use(projectController.listProject))
+api.get('/api/project/:userId', use(projectController.listProject))
 
 api.get('/api/project/:userId/:projectId', authMiddleware.protectStudent, use(projectController.getProject))
 

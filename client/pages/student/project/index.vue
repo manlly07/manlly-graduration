@@ -121,15 +121,8 @@ type Schema = z.output<typeof schema>;
 
 async function loadData() {
     try {
-        const userId = localStorage.getItem('_id');
-        const token = localStorage.getItem('token');
-
-        const headers = {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        };
         const id = localStorage.getItem('_id')
-        const response = await axios.get(`http://localhost:5000/api/project/${id}`, { headers })
+        const response = await axios.get(`http://localhost:5000/api/project/${id}`)
         project.value = response.data
         project.value = response.data.map((item) => {
             return {
@@ -139,7 +132,7 @@ async function loadData() {
         });
     } catch (error) {
         console.error(error);
-    }
+    } 
 }
 
 onMounted(loadData);

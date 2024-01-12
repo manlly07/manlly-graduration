@@ -1,5 +1,5 @@
 <template>
-    <StudentLayout>
+    <TeacherLayout>
         <div class="mt-12 flex gap-8">
             <div class="flex-1 border flex flex-col h-fit">
                 <div class="pt-12 px-8 text-center flex justify-center flex-col w-full items-center">
@@ -52,11 +52,11 @@
                 <NuxtPage />
             </div>
         </div>
-    </StudentLayout>
+    </TeacherLayout>
 </template> 
 
 <script setup lang="ts">
-import StudentLayout from '../layouts/StudentLayout.vue';
+import TeacherLayout from '../layouts/TeacherLayout.vue';
 import axios from 'axios';
 const route = useRoute()
 
@@ -96,7 +96,7 @@ const formattedDOB = computed(() => {
     return '';
 });
 const links = ref([
-{ name: 'Students', path: 'student-class-id', url: `/student/class/${route.params.id}`, icon: 'material-symbols:person-check-rounded' },
+{ name: 'Students', path: 'teacher-class-id', url: `/teacher/class/${route.params.id}`, icon: 'material-symbols:person-check-rounded' },
 ])
 </script>
  

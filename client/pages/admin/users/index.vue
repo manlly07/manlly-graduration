@@ -35,54 +35,31 @@ const columns = [
     key: "role",
     label: "Role",
     sortable: true,
-  },
-  {
-    key: "actions",
-  },
+  }
 ];
 
-const people = ref<any[]>([]);
+const people = ref<any[]>([{
+  _id: '',
+  name: '',
+  phoneNumber: '',
+  email: '',
+  role: undefined
+}]);
 
 async function loadData() { 
   try {
     const response = await axios.get('http://localhost:5000/api/user/getAllTeacherAndStudent');
-    people.value = response.data.userData;
+    people.value = response.data.userData.map(person => ({
+      ...person,
+      role: person.role === 1 ? 'Teacher' : 'Student'
+    }));
   } catch (error) {
     console.error(error);
   }
 }
 
-onMounted(loadData);
 
-const items = (row: any) => [
-  [
-    {
-      label: "Edit",
-      icon: "i-heroicons-pencil-square-20-solid",
-      click: () => console.log("Edit", row.id),
-    },
-    {
-      label: "Duplicate",
-      icon: "i-heroicons-document-duplicate-20-solid",
-    },
-  ],
-  [
-    {
-      label: "Archive",
-      icon: "i-heroicons-archive-box-20-solid",
-    },
-    {
-      label: "Move",
-      icon: "i-heroicons-arrow-right-circle-20-solid",
-    },
-  ],
-  [
-    {
-      label: "Delete",
-      icon: "i-heroicons-trash-20-solid",
-    },
-  ],
-];
+onMounted(loadData);
 
 function downloadCsv(filename: string, csvData: string) {
   const element = document.createElement("a");
@@ -234,11 +211,6 @@ async function submit(event: FormSubmitEvent<Schema>) {
       <UTable :columns="columns" :rows="filteredAndPagedRows" :sort="{ column: 'title' }">
         <template #name-data="{ row }">
           <NuxtLink :to="`/admin/users/${row._id}`">{{ row.name }}</NuxtLink>
-        </template> 
-        <template #actions-data="{ row }">
-          <UDropdown :items="items(row)">
-            <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
-          </UDropdown>
         </template>
       </UTable>
       <div class="flex justify-end mt-4">

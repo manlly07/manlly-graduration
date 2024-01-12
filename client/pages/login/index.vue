@@ -55,7 +55,7 @@ export default {
                     if (response.data.data.role === 0) {
                         await this.$router.push('/student/class');
                     } else if (response.data.data.role === 1) {
-                        await this.$router.push('/teacher');
+                        await this.$router.push('/teacher/class');
                     }
                     else if (response.data.data.role === 2) {
                         await this.$router.push('/admin/users');
