@@ -4,6 +4,7 @@ const Schema = mongoose.Schema
 const ProjectSchema = new Schema({
     projectName: {type: String, required: true},
     userId: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+    type: { type: Number, enum: [0, 1], required: true, default: 0},
     description: {type: String, required: true},
     isApproved: {type: Boolean, default: false},
     listMark: [{type: mongoose.Schema.Types.ObjectId, ref: 'Mark'}],
@@ -17,6 +18,7 @@ exports.create = async function(userId, project){
     const data = {
         projectName: project.projectName,
         userId: userId,
+        type: project.type,
         description: project.description,
         date_created: new Date()
     } 
@@ -86,3 +88,11 @@ exports.listMark = async function(projectId){
     }
 }
 
+exports.getProjectByUserIdAndType = async function(userId, type) {
+    try {
+        const project = await Project.findOne({ userId, type });
+        return project;
+    } catch (error) {
+        throw error;
+    }
+};

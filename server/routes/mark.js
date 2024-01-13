@@ -9,3 +9,4 @@ api.post("/api/mark/:teacherId/:projectId", authMiddleware.protectTeacher, use(m
 api.get("/api/mark/:projectId", authMiddleware.protectStudent, use(markController.listMark))
 
 module.exports = api
+ 

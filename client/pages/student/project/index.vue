@@ -39,6 +39,11 @@
                                 <UFormGroup class="mb-4 flex-1" label="Project's name" name="projectName">
                                     <UInput v-model="state.projectName" placeholder="Name of project" />
                                 </UFormGroup>
+                                <UFormGroup class="mb-4 flex-1" label="Type" name="type">
+                                    <USelect v-model="state.type"
+                                        :options="typeOptions.map(t => ({ label: t.type, value: t._id }))" />
+                                </UFormGroup>
+
                             </div>
                             <div class="flex gap-4">
                                 <UFormGroup class="mb-4 flex-1" label="Description" name="description">
@@ -106,17 +111,36 @@ const columns = [
 
 ];
 
+const typeOptions = [
+    {
+        "type": "First",
+        "_id": 0
+    },
+    {
+        "type": "Second",
+        "_id": 1
+    }];
+
 const project = ref<any[]>([]);
 
 const state = ref({
     projectName: undefined,
+    type: 0,
     description: undefined,
 })
 
+watch(() => state.value.type, (newValue) => {
+    if (typeof newValue === 'string') {
+        state.value.type = parseInt(newValue);
+    }
+});
+
 const schema = z.object({
     projectName: z.string().min(1, "Name is required"),
+    type: z.number().int().min(0, "Type is required"),
     description: z.string().min(1, "Description is required"),
 });
+
 type Schema = z.output<typeof schema>;
 
 async function loadData() {
@@ -132,14 +156,20 @@ async function loadData() {
         });
     } catch (error) {
         console.error(error);
-    } 
+    }
 }
 
 onMounted(loadData);
 
 async function submit(event: FormSubmitEvent<Schema>) {
     let projectId;
+    const userId = localStorage.getItem('_id');
+    const token = localStorage.getItem('token');
 
+    const headers = {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+    };
     try {
         if (fileList.value.length === 0) {
             toast.error("Please upload your file");
@@ -150,14 +180,6 @@ async function submit(event: FormSubmitEvent<Schema>) {
             toast.error("Only upload 1 file");
             return;
         }
-
-        const userId = localStorage.getItem('_id');
-        const token = localStorage.getItem('token');
-
-        const headers = {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        };
 
         const formData = new FormData();
         formData.append('file', fileList.value[0]?.originFileObj);
@@ -201,11 +223,22 @@ const handleChange = (info: UploadChangeParam) => {
         console.log(info.file, info.fileList);
     }
     if (info.file.status === 'done') {
+        const allowedFileTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+        // Kiểm tra nếu loại file không thuộc danh sách cho phép
+        if (!allowedFileTypes.includes(info.file.type)) {
+            toast.error(`Only PDF, DOC, or DOCX files are allowed.`);
+            // Xóa file không hợp lệ khỏi danh sách
+            fileList.value = fileList.value.filter(file => file.uid !== info.file.uid);
+            return;
+        }
+
         toast.success(`${info.file.name} file uploaded successfully`);
     } else if (info.file.status === 'error') {
         toast.error(`${info.file.name} file upload failed.`);
     }
 };
+
 
 const fileList = ref([]);
 const headers = {

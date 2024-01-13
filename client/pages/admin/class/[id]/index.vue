@@ -1,45 +1,22 @@
 <template>
-    <div class="mt-4 px-4 py-8 border">
-        <h3 class="font-medium text-lg text-[#6f6b7d]">Project</h3>
-        <div>
-            <div class="flex gap-4 justify-end mb-4">
-                <UInput
-                size="xl"
-                v-model="table.q"
-                color="white"
-                variant="outline"
-                name="input" 
-                placeholder="Search..."
-                icon="i-heroicons-magnifying-glass-20-solid"
-                />
-            </div> 
-            <UTable
-                :columns="columns"
-                :rows="filteredAndPagedRows"
-                :sort="{ column: 'title' }"
-            >
-                <template #name-data="{ row }">
-                <NuxtLink :to="`/admin/users/${row._id}`">{{ row.name }}</NuxtLink>
-                </template>
-                <template #actions-data="{ row }">
-                <UDropdown :items="items(row)">
-                    <UButton
-                    color="gray"
-                    variant="ghost"
-                    icon="i-heroicons-ellipsis-horizontal-20-solid"
-                    />
-                </UDropdown>
-                </template>
-            </UTable>
-            <div class="flex justify-end mt-4">
-                <UPagination
-                v-model="table.page"
-                :page-count="pageCount"
-                :total="totalCount"
-                />
-            </div>
-        </div>
+  <div class="mt-4 px-4 py-8 border">
+    <h3 class="font-medium text-lg text-[#6f6b7d]">Project</h3>
+    <div>
+      <div class="flex gap-4 justify-end mb-4">
+        <UInput size="xl" v-model="table.q" color="white" variant="outline" name="input" placeholder="Search..."
+          icon="i-heroicons-magnifying-glass-20-solid" />
+      </div>
+      <UTable :columns="columns" :rows="filteredAndPagedRows" :sort="{ column: 'title' }">
+        <template #name-data="{ row }">
+          <NuxtLink :to="`/admin/users/${row._id}`">{{ row.name }}</NuxtLink>
+        </template>
+
+      </UTable>
+      <div class="flex justify-end mt-4">
+        <UPagination v-model="table.page" :page-count="pageCount" :total="totalCount" />
+      </div>
     </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -53,9 +30,9 @@ async function loadData() {
     const id = route.params.id;
     const response = await axios.get(`http://localhost:5000/api/class/${id}`);
     student.value = response.data;
-    } catch (error) {
-        console.error(error);
-    }
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 onMounted(loadData);
@@ -90,36 +67,6 @@ const columns = [
   {
     key: "actions",
   },
-];
-
-const items = (row) => [
-  [
-    {
-      label: "Edit",
-      icon: "i-heroicons-pencil-square-20-solid",
-      click: () => console.log("Edit", row.id),
-    },
-    {
-      label: "Duplicate",
-      icon: "i-heroicons-document-duplicate-20-solid",
-    },
-  ],
-  [
-    {
-      label: "Archive",
-      icon: "i-heroicons-archive-box-20-solid",
-    },
-    {
-      label: "Move",
-      icon: "i-heroicons-arrow-right-circle-20-solid",
-    },
-  ],
-  [
-    {
-      label: "Delete",
-      icon: "i-heroicons-trash-20-solid",
-    },
-  ],
 ];
 
 const table = ref({

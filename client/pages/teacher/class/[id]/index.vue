@@ -8,7 +8,7 @@
             </div>
             <UTable :columns="columns" :rows="filteredAndPagedRowsStudent" :sort="{ column: 'title' }">
                 <template #name-data="{ row }">
-                    {{ row.name }}
+                    <NuxtLink :to="`/teacher/users/${row._id}`">{{ row.name }}</NuxtLink>
                 </template>
             </UTable>
             <div class="flex justify-end mt-4">

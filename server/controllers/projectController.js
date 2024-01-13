@@ -2,21 +2,31 @@ const projectModel = require('../models/Project')
 const utility = require('../helper/utility')
 
 exports.addProject = async function(req, res){
-    const data = req.body
-    utility.validate(data, ['projectName', 'description'])
-    const userId = req.params.userId
+    const data = req.body;
+    utility.validate(data, ['projectName', 'description']);
+    const userId = req.params.userId;
 
-    const checkQuantity = await projectModel.get(userId)
-    if (checkQuantity.length === 2) {
-        return res.status(404).json({message: 'bad request'})
+    try {
+        // Kiểm tra xem đã có project nào với userId và type tương ứng chưa
+        const existingProject = await projectModel.getProjectByUserIdAndType(userId, data.type);
+
+        if (existingProject) {
+            return res.status(400).json({ message: 'Project with the same userId and type already exists.' });
+        }
+
+        // Nếu chưa có, thì tạo mới project
+        const newProject = await projectModel.create(userId, data);
+        
+        if(!newProject){
+            return res.status(500).json({ message: 'Error creating project.' });
+        }    
+
+        return res.status(200).json(newProject);
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'Internal Server Error.' });
     }
-
-    const newProject = await projectModel.create(userId, data)
-    if(!newProject){
-        return res.status(500).json({message: 'error'})
-    }    
-    return res.status(200).json(newProject)
-}
+};
 
 exports.listProject = async function(req, res){
     debugger

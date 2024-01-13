@@ -4,7 +4,8 @@ const Schema = mongoose.Schema
 const MarkSchema = new Schema({
     mark: {type: Number, required: true, default: 0},
     type: { type: Number, enum: [0, 1, 2], required: true},
-    teacherId : {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+    teacherId : {type: mongoose.Schema.Types.ObjectId, ref: 'User', default: ''},
+    comment: { type: String, default: ''},
     date_created: Date
 }) 
 
@@ -16,6 +17,7 @@ exports.create = async function(teacherId,mark){
         mark: mark.mark,
         type: mark.type, 
         teacherId: teacherId,
+        comment: mark.comment,
         date_created: new Date()
     }
     const newMark = Mark(data)
