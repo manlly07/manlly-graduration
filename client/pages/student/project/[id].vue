@@ -23,23 +23,35 @@
                         <span class="font-medium text-sm">State: </span>
                         <span>{{ projectInfo.isApproved }}</span>
                     </div>
-                    <div class="mt-4">
-                        <span class="font-medium text-sm">Guidance Score: </span>
-                        <span>0</span>
+                    <div v-if="projectInfo.type == 0">
+                        <div class="mt-4">
+                            <span class="font-medium text-sm">Execution Score: </span>
+                            <span>{{ listMark.execution }}</span>
+                        </div>
                     </div>
-                    <div class="mt-4">
-                        <span class="font-medium text-sm">Execution Score: </span>
-                        <span>0</span>
-                    </div>
-                    <div class="mt-4">
-                        <span class="font-medium text-sm">Defense Score: </span>
-                        <span>0</span>
-                    </div>
-                    <div class="mt-4">
-                        <span class="font-medium text-sm">Final Project Score: </span>
-                        <span>0</span>
-                    </div>
-                    <div class="mt-4">
+                    <div v-if="projectInfo.type == 1">
+                        <div class="mt-4">
+                            <span class="font-medium text-sm">Guidance Score: </span>
+                            <span>{{ listMark.guidance }}</span>
+                        </div>
+                        <div class="mt-4">
+                            <span class="font-medium text-sm">Execution Score: </span>
+                            <span>{{ listMark.execution }}</span>
+                        </div>
+                        <div class="mt-4">
+                            <span class="font-medium text-sm">Proccess Score: </span>
+                            <span>{{ listMark.proccess }}</span>
+                        </div>
+                        <div class="mt-4">
+                            <span class="font-medium text-sm">Defense Score: </span>
+                            <span>{{ listMark.sumDefense }}</span>
+                        </div>
+                        <div class="mt-4">
+                            <span class="font-medium text-sm">Final Project Score: </span>
+                            <span>{{ listMark.final }}</span>
+                        </div>
+                        <div class="mt-4">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -64,7 +76,7 @@ import StudentLayout from '../layouts/StudentLayout.vue';
 import axios from 'axios';
 import { useToast } from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
-import type { FormSubmitEvent } from "@nuxt/ui/dist/runtime/types";
+
 const route = useRoute()
 const toast = useToast();
 
@@ -73,27 +85,59 @@ const projectInfo = ref({
     projectName: '',
     description: '',
     isApproved: '',
+    isDenied: '',
     listMark: '',
-    date_created: ''
+    date_created: '',
+    deadline: '',
+    type: 0
+});
+
+const listMark = ref<any>({
+    guidance: 0,
+    execution: 0,
+    defense: 0,
+    proccess: 0,
+    sumDefense: 0,
+    final: 0
 });
 
 async function loadData() {
     try {
-        const token = localStorage.getItem('token');
         const userId = process.client ? localStorage.getItem('_id') : '';
         const id = route.params.id;
-        const headers = {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        };
-        const response = await axios.get(`http://localhost:5000/api/project/${userId}/${id}`, { headers });
-
+        const response = await axios.get(`http://localhost:5000/api/project/${userId}/${id}`);
+        const response_mark = await axios.get(`http://localhost:5000/api/mark/${id}`)
         const projectData = response.data[0];
 
         projectInfo.value = {
             ...projectData,
-            isApproved: projectData.isApproved ? 'Đã xét duyệt' : 'Chưa được xét duyệt'
+            isApproved: projectData.isApproved ? 'Đã xét duyệt' : projectData.isDenied ? 'Bị từ chối' : 'Chưa được chấp nhận'
         };
+        response_mark.data.forEach(markData => {
+            switch (markData.type) {
+                case 0:
+                    listMark.value.guidance = markData.mark;
+                    break;
+                case 1:
+                    listMark.value.execution = markData.mark;
+                    break;
+                case 2:
+                    listMark.value.defense = markData.mark;
+
+                    break;
+                case 3:
+                    listMark.value.proccess = markData.mark;
+                    break;
+                case 4:
+                    listMark.value.sumDefense = markData.mark;
+                    break;
+                case 5:
+                    listMark.value.final = markData.mark;
+                    break;
+                default:
+                    break;
+            }
+        });
     } catch (error) {
         console.error(error);
     }

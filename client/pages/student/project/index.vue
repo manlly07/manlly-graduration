@@ -151,12 +151,12 @@ async function loadData() {
         project.value = response.data.map((item) => {
             return {
                 ...item,
-                isApproved: item.isApproved ? 'Đã xét duyệt' : 'Chưa được xét duyệt'
+                isApproved: item.isApproved ? 'Đã xét duyệt' : item.isDenied ? 'Bị từ chối' : 'Chưa được chấp nhận'
             };
         });
     } catch (error) {
         console.error(error);
-    }
+    } 
 }
 
 onMounted(loadData);

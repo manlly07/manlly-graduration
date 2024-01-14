@@ -7,8 +7,10 @@ const ProjectSchema = new Schema({
     type: { type: Number, enum: [0, 1], required: true, default: 0},
     description: {type: String, required: true},
     isApproved: {type: Boolean, default: false},
+    isDenied: {type: Boolean, default: false},
     listMark: [{type: mongoose.Schema.Types.ObjectId, ref: 'Mark'}],
-    date_created: Date
+    date_created: Date,
+    deadline: { type: Date, default: () => new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) }
 })
 
 const Project = mongoose.model('Project', ProjectSchema, 'projects')
@@ -66,7 +68,6 @@ exports.delete = async function(projectId){
 
 exports.addMark = async function(projectId, markId){
     try{
-        debugger
         const project = await Project.findById(projectId)
         project.listMark.push(markId)
         project.markModified('listMark')
@@ -92,6 +93,15 @@ exports.getProjectByUserIdAndType = async function(userId, type) {
     try {
         const project = await Project.findOne({ userId, type });
         return project;
+    } catch (error) {
+        throw error;
+    }
+};
+
+exports.getApprovedProjectsByUserId = async function(userId) {
+    try {
+        const projects = await Project.find({ userId, isApproved: true });
+        return projects;
     } catch (error) {
         throw error;
     }

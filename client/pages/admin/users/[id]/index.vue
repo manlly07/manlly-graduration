@@ -12,7 +12,7 @@
         <UPagination v-model="table.page" :page-count="pageCount" :total="totalCount" />
       </div>
     </div>
-  </div>
+  </div> 
 </template>
 
 <script setup lang="ts">
@@ -38,7 +38,7 @@ async function loadData() {
       project.value = response.data.map((item) => {
         return {
           ...item,
-          isApproved: item.isApproved ? 'Đã xét duyệt' : 'Chưa được xét duyệt'
+          isApproved: item.isApproved ? 'Đã xét duyệt' : 'Chưa được chấp nhận'
         };
       });
       columns = [

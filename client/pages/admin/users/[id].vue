@@ -223,7 +223,7 @@ const study = [
     },
 ];
 
-const formattedDOB = computed(() => {
+const formattedDOB = computed(() => { 
     console.log(userData.value.DOB)
     const rawDOB = userData.value.DOB;
     if (rawDOB) {
@@ -257,7 +257,7 @@ const majorOptions = computed(() => {
 
 const roleText = computed(() => {
     return userData.value.role === 0 ? 'Student' : 'Teacher';
-});
+}); 
 const getAvatarSrc = computed(() => {
     if (userData.value.role === 0) {
         return avatarStudent;

@@ -3,7 +3,8 @@ const Schema = mongoose.Schema
 
 const MarkSchema = new Schema({
     mark: {type: Number, required: true, default: 0},
-    type: { type: Number, enum: [0, 1, 2], required: true},
+    type: { type: Number, enum: [0, 1, 2, 3, 4, 5], required: true},
+    // 0 là hướng dẫn, 1 là thực hiện, 2 là bảo vệ và 3 là quá trình, 4 là tổng điểm bảo vệ, 5 là điểm tổng kết
     teacherId : {type: mongoose.Schema.Types.ObjectId, ref: 'User', default: ''},
     comment: { type: String, default: ''},
     date_created: Date

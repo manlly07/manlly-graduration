@@ -10,14 +10,14 @@ exports.addProject = async function(req, res){
         // Kiểm tra xem đã có project nào với userId và type tương ứng chưa
         const existingProject = await projectModel.getProjectByUserIdAndType(userId, data.type);
 
-        if (existingProject) {
+        if (existingProject && !existingProject.isDenied) {
             return res.status(400).json({ message: 'Project with the same userId and type already exists.' });
         }
 
         // Nếu chưa có, thì tạo mới project
         const newProject = await projectModel.create(userId, data);
         
-        if(!newProject){
+        if(!newProject){ 
             return res.status(500).json({ message: 'Error creating project.' });
         }    
 
@@ -29,7 +29,6 @@ exports.addProject = async function(req, res){
 };
 
 exports.listProject = async function(req, res){
-    debugger
     const userId = req.params.userId
     const projects = await projectModel.get(userId)
     if(!projects){
