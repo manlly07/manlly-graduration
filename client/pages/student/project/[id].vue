@@ -50,8 +50,9 @@
                             <span class="font-medium text-sm">Final Project Score: </span>
                             <span>{{ listMark.final }}</span>
                         </div>
-                        <div class="mt-4">
-                        </div>
+
+                    </div>
+                    <div class="mt-4">
                     </div>
                 </div>
             </div>

@@ -39,7 +39,7 @@
                             <span>{{ listMark.defense }}</span>
                         </div>
                     </div>
-                    <div v-if="projectInfo.type == 1">
+                    <div v-else-if="projectInfo.type == 1">
                         <div class="mt-4">
                             <span class="font-medium text-sm">Guidance Score: </span>
                             <span>{{ listMark.guidance }}</span>
@@ -201,7 +201,7 @@ const state = ref({
 })
 const mark = ref({
     mark: 0,
-    type: isExamination ? 1 : 2,
+    type: isExamination ? 2 : 1,
     comment: ''
 });
 const typeOptions = [
@@ -249,7 +249,7 @@ async function loadData() {
             isApproved: projectData.isApproved ? 'Đã xét duyệt' : 'Chưa được chấp nhận'
         };
         state.value.deadline = formattedDOB.value;
-        responseMark.value = response_mark.data; 
+        responseMark.value = response_mark.data;
         response_mark.data.forEach(markData => {
             switch (markData.type) {
                 case 0:
@@ -257,14 +257,16 @@ async function loadData() {
                     break;
                 case 1:
                     listMark.value.execution = markData.mark;
-                    if (projectInfo.value.type == 0 || isExamination) {
+                    if (projectInfo.value.type == 0) {
                         mark.value.mark = markData.mark;
                         mark.value.comment = markData.comment;
                     }
                     break;
                 case 2:
-                    if (markData.teacherId === teacherId) {
+                    if (markData.teacherId == teacherId && isExamination) {
                         listMark.value.defense = markData.mark;
+                        mark.value.mark = markData.mark;
+                        mark.value.comment = markData.comment;
                     }
                     break;
                 case 3:
@@ -280,6 +282,7 @@ async function loadData() {
                     break;
             }
         });
+        console.log(mark)
     } catch (error) {
         console.error(error);
     }
@@ -315,10 +318,10 @@ async function submitMark(event: FormSubmitEvent<Schema>) {
         if (selectedType) {
             event.data.type = selectedType._id;
         } else {
-            // Nếu không tìm thấy, có thể xử lý theo ý bạn, ví dụ: nếu không tìm thấy, đặt giá trị mặc định
-            event.data.type = 0; // Giả sử giá trị mặc định là 0
+            event.data.type = 0;
         }
         event.data.mark = parseFloat(event.data.mark);
+        console.log(event.data)
         const response_mark = await axios.post(`http://localhost:5000/api/mark/${teacherId}/${studentId}/${projectId}`, event.data, { headers });
         if (response_mark.data.state == 422) {
             console.log(event.data, mark)
@@ -385,14 +388,16 @@ function getShortFileName(fileName: string): string {
 }
 onMounted(loadData)
 
-watchEffect(() => {
-    const selectedMark = responseMark.value.find((markData) => markData.type == mark.value.type);
-    if (selectedMark) {
-        mark.value.mark = selectedMark.mark;
-        mark.value.comment = selectedMark.comment;
-    } else {
-        mark.value.mark = 0;
-        mark.value.comment = '';
+watch(() => mark.value.type, (newValue, oldValue) => {
+    if (isExamination.value == false) {
+        const selectedMark = responseMark.value.find(markData => markData.type == newValue);
+        if (selectedMark) {
+            mark.value.mark = selectedMark.mark;
+            mark.value.comment = selectedMark.comment;
+        } else {
+            mark.value.mark = 0;
+            mark.value.comment = '';
+        }
     }
 });
 </script>
