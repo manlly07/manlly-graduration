@@ -55,12 +55,9 @@
                                 <p class="text-gray-500">Time</p>
                             </div>
                         </li>
-                        <li class="flex gap-4 mb-4 justify-end">
+                        <li class="flex gap-4 mb-4 justify-end" v-for="msg in messages" :key="msg">
                             <div class="w-3/4">
-                                <p class="bg-white shadow-md p-4 mb-2">Lorem ipsum dolor sit amet, consectetur adipisicing
-                                    elit. Quod distinctio tenetur cum praesentium, cumque exercitationem dolorum corrupti
-                                    assumenda molestiae temporibus quidem incidunt, necessitatibus, sapiente dignissimos ea!
-                                    Et deserunt repellat perferendis?</p>
+                                <p class="bg-white shadow-md p-4 mb-2"></p>
                                 <p class="text-gray-500">Time</p>
                             </div>
                             <div>
@@ -70,7 +67,7 @@
                     </ul>
                     <div class="flex items-center gap-4 p-4 h-20">
                         <UInput class="flex-1" size="xl" name="input" placeholder="Type your message here" />
-                        <UButton color="primary" variant="solid" label="Send" size="xl" />
+                        <UButton color="primary" variant="solid" label="Send" size="xl" @click="sendMessage"/>
                     </div>
                 </div>
             </div>
@@ -125,6 +122,8 @@ const state = ref({
 });
 type Schema = z.output<typeof schema>;
 
+
+let messages = ref([])
 async function loadData() {
     try {
         const response_people = await axios.get("http://localhost:5000/api/user/getAllTeacherAndStudent");
@@ -137,8 +136,7 @@ async function loadData() {
 
 onMounted(loadData)
 
-async function submit(event: FormSubmitEvent<Schema>) {
-    console.log(event.data)
+async function sendMessage() {
     try {
         
     } catch (error) {

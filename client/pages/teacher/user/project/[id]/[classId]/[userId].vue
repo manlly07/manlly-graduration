@@ -282,7 +282,7 @@ async function loadData() {
                     break;
             }
         });
-        console.log(mark)
+        console.log(mark, listMark)
     } catch (error) {
         console.error(error);
     }
