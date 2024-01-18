@@ -50,6 +50,10 @@
                     </div>
                 </template>
                 <UForm :schema="schema" :state="state" @submit="submit">
+
+                    <UFormGroup class="mb-4 flex-1" label="Name of chat" name="chatName">
+                        <UInput v-model="state.chatName" placeholder="Group name" />
+                    </UFormGroup>
                     <UFormGroup class="mb-4 flex-1" label="Add by email" name="listUser">
                         <Select v-model:value="state.listUser"
                             :options="studentOptions.map(t => ({ label: t.email, value: t._id }))" mode="tags"
@@ -83,6 +87,7 @@ type Schema = z.output<typeof schema>;
 const MAX_CHAT_NAME_LENGTH = 15;
 let studentOptions = ref([]);
 const state = ref({
+    chatName: '',
     listUser: [] as string[],
 });
 
@@ -103,16 +108,16 @@ async function loadData() {
                 chat.chatName = shortenString(chat.chatName, MAX_CHAT_NAME_LENGTH);
 
                 // if (chat.listUser && chat.listUser.includes(userId)) {
-                    if (chat.listMessage && Object.keys(chat.listMessage).length > 0) {
-                        const lastMessageKey = Object.keys(chat.listMessage).pop();
-                        chat.lastMessage = chat.listMessage[lastMessageKey].message;
-                        chat.lastTime = chat.listMessage[lastMessageKey].time;
-                    } else {
-                        chat.lastMessage = null;
-                        chat.lastTime = null;
-                    }
+                if (chat.listMessage && Object.keys(chat.listMessage).length > 0) {
+                    const lastMessageKey = Object.keys(chat.listMessage).pop();
+                    chat.lastMessage = chat.listMessage[lastMessageKey].message;
+                    chat.lastTime = chat.listMessage[lastMessageKey].time;
+                } else {
+                    chat.lastMessage = null;
+                    chat.lastTime = null;
+                }
 
-                    chatGroup.value.push(chat);
+                chatGroup.value.push(chat);
                 // }
             });
         });
@@ -126,15 +131,15 @@ onMounted(loadData);
 
 async function submit(event: FormSubmitEvent<Schema>) {
     try {
-        const selectedUsers = event.data.listUser.map(userId => {
-            const user = studentOptions.value.find(student => student._id === userId);
-            return user ? user.name : '';
-        });
+        // const selectedUsers = event.data.listUser.map(userId => {
+        //     const user = studentOptions.value.find(student => student._id === userId);
+        //     return user ? user.name : '';
+        // });
 
-        const chatName = selectedUsers.filter(Boolean).join(', ');
+        // const chatName = selectedUsers.filter(Boolean).join(', ');
 
         const newChat = {
-            chatName: chatName,
+            chatName: event.data.chatName,
             listUser: event.data.listUser,
             listMessage: []
         };

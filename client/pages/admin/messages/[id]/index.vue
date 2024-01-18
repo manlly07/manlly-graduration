@@ -16,6 +16,8 @@
                     @click="isOpenView = true" />
                 <Icon name="material-symbols:person-add" class="mr-4 mt-[2px] text-gray-500" size="25"
                     @click="isOpenAdd = true" />
+                <Icon name="material-symbols:edit" class="mr-4 mt-[2px] text-gray-500" size="25"
+                    @click="isOpenUpdate = true" />
             </div>
         </div>
         <div class="px-4 w-full bg-[#f8f7fa]">
@@ -73,8 +75,34 @@
                     <UForm :schema="schema" :state="state" @submit="submit">
                         <UFormGroup class="mb-4 flex-1" label="Add by email" name="listUser">
                             <Select v-model:value="state.listUser"
-                                :options="studentOptions.map(t => ({ label: t.email, value: t._id }))" mode="tags"
-                                placeholder="Please select" class="w-100"></Select>
+                                :options="filteredUserData.map(user => ({ label: user.email, value: user._id }))"
+                                mode="tags" placeholder="Please select" class="w-100"></Select>
+                        </UFormGroup>
+                        <UButton type="submit"> Submit </UButton>
+                    </UForm>
+                </UCard>
+            </UModal>
+        </template>
+        <template>
+            <UModal v-model="isOpenUpdate" prevent-close>
+                <UCard :ui="{
+                    ring: '',
+                    divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+                }">
+                    <template #header>
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                                Update name of group
+                            </h3>
+                            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                                @click="isOpenUpdate = false" />
+                        </div>
+                    </template>
+                    <UForm :schema="schema" :state="state" @submit="submit">
+                        <UFormGroup class="mb-4 flex-1" label="Add by email" name="listUser">
+                            <Select v-model:value="state.listUser"
+                                :options="filteredUserData.map(user => ({ label: user.email, value: user._id }))"
+                                mode="tags" placeholder="Please select" class="w-100"></Select>
                         </UFormGroup>
                         <UButton type="submit"> Submit </UButton>
                     </UForm>
@@ -83,12 +111,13 @@
         </template>
     </AdminLayout>
 </template>
+
 <script setup lang="ts">
 import AdminLayout from '~/layouts/AdminLayout.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useToast } from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
-import { database, ref as dbRef, push, onValue } from '~/firebase';
+import { database, ref as dbRef, push, onValue, get, set } from '~/firebase';
 import axios from 'axios';
 import * as z from "zod";
 import { Select } from 'ant-design-vue'
@@ -101,6 +130,8 @@ const userId = process.client ? localStorage.getItem('_id') : '';
 
 const isOpenView = ref(false);
 const isOpenAdd = ref(false);
+const isOpenUpdate = ref(false);
+
 const schema = z.object({
     listUser: z.array(z.string()).min(1, "Please select at least one user"),
 });
@@ -110,27 +141,33 @@ const state = ref({
 });
 let message = ref("");
 const messages = ref({});
-let studentOptions = ref([]);
+let userData = ref([]);
 const members = ref([]);
+const filteredUserData = ref([]);
 
 async function loadData() {
     try {
         const chatRef = dbRef(database, `chat/${chatId}`);
-        const response = await axios.get('http://localhost:5000/api/user/getAllTeacherAndStudent')
-        studentOptions.value = response.data.userData
+        const response = await axios.get('http://localhost:5000/api/user/getAllTeacherAndStudent');
+        userData.value = response.data.userData
             .map(person => ({ _id: person._id, email: person.email, name: person.name }));
+
         onValue(chatRef, (snapshot) => {
             const chatData = snapshot.val();
             messages.value = chatData ? chatData : {};
+
             members.value = messages.value.listUser.map(memberId => {
-                const user = studentOptions.value.find(student => student._id === memberId);
+                const user = userData.value.find(student => student._id === memberId);
                 return user ? { name: user.name, email: user.email } : { name: 'Unknown User', email: 'Unknown Email' };
             });
+
             if (messages.value.listMessage) {
                 messages.value.listMessage = reverseObject(messages.value.listMessage);
             }
         });
-        console.log(members)
+        filteredUserData.value = userData.value.filter(user => {
+            return !members.value.some(member => member.email == user.email);
+        });
     } catch (error) {
         toast.error('Error occurred');
     }
@@ -160,10 +197,18 @@ async function sendMessage() {
 
 async function submit(event: FormSubmitEvent<Schema>) {
     try {
-
+        console.log(event.data)
+        const chatUserRef = dbRef(database, `chat/${chatId}/listUser`);
+        const existingListUserSnapshot = await get(chatUserRef);
+        const existingListUser = existingListUserSnapshot.val() || [];
+        const newListUser = [...existingListUser, ...event.data.listUser];
+        await set(chatUserRef, newListUser);
+        loadData();
+        toast.success('Members added successfully!');
+        isOpenAdd.value = false;
     } catch (error) {
-        console.log(error)
-        toast.error('Error adding member');
+        console.error('Error adding members:', error);
+        toast.error('Error adding members');
     }
 }
 
@@ -189,7 +234,7 @@ function getMessageSender(senderId) {
     if (senderId === userId) {
         return 'By you';
     } else {
-        const user = studentOptions.value.find(student => student._id === senderId);
+        const user = userData.value.find(student => student._id === senderId);
         return user ? 'By ' + user.name : 'Unknown sender';
     }
 }
