@@ -107,18 +107,18 @@ async function loadData() {
                 chat.id = d.key;
                 chat.chatName = shortenString(chat.chatName, MAX_CHAT_NAME_LENGTH);
 
-                // if (chat.listUser && chat.listUser.includes(userId)) {
-                if (chat.listMessage && Object.keys(chat.listMessage).length > 0) {
-                    const lastMessageKey = Object.keys(chat.listMessage).pop();
-                    chat.lastMessage = chat.listMessage[lastMessageKey].message;
-                    chat.lastTime = chat.listMessage[lastMessageKey].time;
-                } else {
-                    chat.lastMessage = null;
-                    chat.lastTime = null;
-                }
+                if (chat.listUser && chat.listUser.includes(userId)) {
+                    if (chat.listMessage && Object.keys(chat.listMessage).length > 0) {
+                        const lastMessageKey = Object.keys(chat.listMessage).pop();
+                        chat.lastMessage = chat.listMessage[lastMessageKey].message;
+                        chat.lastTime = chat.listMessage[lastMessageKey].time;
+                    } else {
+                        chat.lastMessage = null;
+                        chat.lastTime = null;
+                    }
 
-                chatGroup.value.push(chat);
-                // }
+                    chatGroup.value.push(chat);
+                }
             });
         });
         console.log(chatGroup);
@@ -131,16 +131,17 @@ onMounted(loadData);
 
 async function submit(event: FormSubmitEvent<Schema>) {
     try {
-        // const selectedUsers = event.data.listUser.map(userId => {
-        //     const user = studentOptions.value.find(student => student._id === userId);
-        //     return user ? user.name : '';
-        // });
+        const userId = process.client ? localStorage.getItem('_id') : '';
 
-        // const chatName = selectedUsers.filter(Boolean).join(', ');
+        const selectedUsers = event.data.listUser;
+
+        if (!selectedUsers.includes(userId)) {
+            selectedUsers.push(userId);
+        }
 
         const newChat = {
             chatName: event.data.chatName,
-            listUser: event.data.listUser,
+            listUser: selectedUsers,
             listMessage: []
         };
 
@@ -149,10 +150,11 @@ async function submit(event: FormSubmitEvent<Schema>) {
         toast.success('Chat created successfully!');
         isOpen.value = false;
     } catch (error) {
-        console.log(error)
+        console.log(error);
         toast.error('Error creating chat');
     }
 }
+
 
 function shortenString(str, maxLength) {
     return str.length > maxLength ? str.substring(0, maxLength - 3) + '...' : str;

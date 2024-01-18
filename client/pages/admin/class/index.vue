@@ -64,6 +64,7 @@ import { useToast } from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 import { ref } from 'vue';
 import { Select } from 'ant-design-vue'
+import { database, ref as dbRef, push, onValue } from '~/firebase';
 
 let student = ref([]);
 let studentOptions = ref([]);
@@ -138,6 +139,12 @@ async function submit(event: FormSubmitEvent<Schema>) {
   } else {
     try {
       const response = await axios.post('http://localhost:5000/api/class', event.data, { headers });
+      const newChat = {
+        chatName: event.data.className,
+        listUser: event.data.listUser,
+        listMessage: []
+      };
+      await push(dbRef(database, "chat"), newChat);
       const stateResponse = response.data;
       if (stateResponse) {
         isOpen.value = false;
