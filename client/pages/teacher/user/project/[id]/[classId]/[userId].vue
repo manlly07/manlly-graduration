@@ -71,6 +71,9 @@
                 </div>
                 <div class="flex gap-4 my-4 m-auto" v-if="projectInfo.isApproved == 'Đã xét duyệt'">
                     <UButton color="primary" variant="solid" size="xl" @click="isOpenMark = true">Mark</UButton>
+                    <UButton color="blue" variant="solid" size="xl" @click="isOpenViewMark = true">
+                        <Icon name="material-symbols:visibility" class="text-white" />
+                    </UButton>
                 </div>
             </div>
             <div class="flex-[2]">
@@ -165,6 +168,28 @@
                     </UModal>
                 </div>
             </template>
+            <template>
+                <div>
+                    <UModal v-model="isOpenViewMark" prevent-close>
+                        <UCard :ui="{
+                            ring: '',
+                            divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+                        }">
+                            <template #header>
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                                        {{ projectInfo.projectName }}
+                                    </h3>
+                                    <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                                        @click="isOpenViewMark = false" />
+                                </div>
+                            </template>
+                            <UTable :columns="columns" :rows="listViewMark" :sort="{ column: 'title' }">
+                            </UTable>
+                        </UCard>
+                    </UModal>
+                </div>
+            </template>
         </div>
     </TeacherLayout>
 </template>
@@ -180,6 +205,7 @@ const route = useRoute()
 const toast = useToast();
 const isOpenAccept = ref(false);
 const isOpenMark = ref(false);
+const isOpenViewMark = ref(false);
 const isExamination = ref(false);
 const projectInfo = ref({
     _id: '',
@@ -192,7 +218,23 @@ const projectInfo = ref({
     deadline: '',
     type: 0
 });
-
+const columns = [
+    {
+        key: "type",
+        label: "Type",
+        sortable: true,
+    },
+    {
+        key: "mark",
+        label: "Mark",
+        sortable: true,
+    },
+    {
+        key: "comment",
+        label: "Comment",
+        sortable: true,
+    },
+];
 const schema = z.object({});
 
 type Schema = z.output<typeof schema>;
@@ -218,6 +260,32 @@ const typeOptions = [
         "_id": 2
     }
 ];
+const listOfType = [
+    {
+        "type": "Guidance",
+        "_id": 0
+    },
+    {
+        "type": "Execution",
+        "_id": 1
+    },
+    {
+        "type": "Defense",
+        "_id": 2
+    },
+    {
+        "type": "Process",
+        "_id": 3
+    },
+    {
+        "type": "Sum of defense",
+        "_id": 4
+    },
+    {
+        "type": "Final",
+        "_id": 5
+    },
+];
 const listMark = ref<any>({
     guidance: 0,
     execution: 0,
@@ -227,6 +295,11 @@ const listMark = ref<any>({
     final: 0
 });
 const responseMark = ref([]);
+const listViewMark = ref([{
+    mark: 0,
+    type: 0,
+    comment: ''
+}]);
 
 const file = ref<any>();
 async function loadData() {
@@ -250,6 +323,10 @@ async function loadData() {
         };
         state.value.deadline = formattedDOB.value;
         responseMark.value = response_mark.data;
+        listViewMark.value = response_mark.data.map(markData => ({
+            ...markData,
+            type: getTypeLabel(markData.type)
+        }));
         response_mark.data.forEach(markData => {
             switch (markData.type) {
                 case 0:
@@ -380,7 +457,7 @@ function isWordDoc(fileName: string): boolean {
 }
 
 function getShortFileName(fileName: string): string {
-    const maxLength = 20; // Đặt độ dài tối đa cho tên tệp tin rút gọn
+    const maxLength = 20;
     if (fileName.length <= maxLength) {
         return fileName;
     }
@@ -400,6 +477,10 @@ watch(() => mark.value.type, (newValue, oldValue) => {
         }
     }
 });
+
+function getTypeLabel(type) {
+    return listOfType.find(t => t._id === type)?.type || '';
+}
 </script>
 <style>
 .icon-text {

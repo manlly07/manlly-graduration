@@ -32,41 +32,50 @@
                     </div>
                 </div>
             </div>
-            <div class="w-2/3">
+            <div class="w-2/3 flex-container">
+                <div className="welcome_container">
+                    <img src="../../../assets/images/heart.gif" />
+                    <h1>
+                        WELCOME
+                    </h1>
+                    <h3>Please select a chat to Start messaging.</h3>
+                </div>
             </div>
         </div>
-        <UModal v-model="isOpen" prevent-close>
-            <UCard :ui="{
-                ring: '',
-                divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-            }">
-                <template #header>
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                            Add new chat
-                        </h3>
-                        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
-                            @click="isOpen = false" />
-                    </div>
-                </template>
-                <UForm :schema="schema" :state="state" @submit="submit">
+        <template>
+            <UModal v-model="isOpen" prevent-close>
+                <UCard :ui="{
+                    ring: '',
+                    divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+                }">
+                    <template #header>
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+                                Add new chat
+                            </h3>
+                            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
+                                @click="isOpen = false" />
+                        </div>
+                    </template>
+                    <UForm :schema="schema" :state="state" @submit="submit">
 
-                    <UFormGroup class="mb-4 flex-1" label="Name of chat" name="chatName">
-                        <UInput v-model="state.chatName" placeholder="Group name" />
-                    </UFormGroup>
-                    <UFormGroup class="mb-4 flex-1" label="Add by email" name="listUser">
-                        <Select v-model:value="state.listUser"
-                            :options="studentOptions.map(t => ({ label: t.email, value: t._id }))" mode="tags"
-                            placeholder="Please select" class="w-100"></Select>
-                    </UFormGroup>
-                    <UButton type="submit"> Submit </UButton>
-                </UForm>
-            </UCard>
-        </UModal>
+                        <UFormGroup class="mb-4 flex-1" label="Name of chat" name="chatName">
+                            <UInput v-model="state.chatName" placeholder="Group name" />
+                        </UFormGroup>
+                        <UFormGroup class="mb-4 flex-1" label="Add by email" name="listUser">
+                            <Select v-model:value="state.listUser"
+                                :options="studentOptions.map(t => ({ label: t.email, value: t._id }))" mode="tags"
+                                placeholder="Please select" class="w-100"></Select>
+                        </UFormGroup>
+                        <UButton type="submit"> Submit </UButton>
+                    </UForm>
+                </UCard>
+            </UModal>
+        </template>
     </TeacherLayout>
 </template>
 
-<script setup lang="ts"> 
+<script setup lang="ts">
 import TeacherLayout from '../layouts/TeacherLayout.vue';
 import { ref, onMounted } from 'vue';
 import * as z from "zod";
@@ -170,3 +179,26 @@ function formatTime(isoString) {
     return new Date(isoString).toLocaleString(undefined, options);
 }
 </script>
+
+<style>
+  .flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    margin: auto;
+  }
+
+  .welcome_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: black;
+  }
+
+  img {
+    height: 10rem;
+  }
+</style>

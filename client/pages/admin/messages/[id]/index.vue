@@ -216,14 +216,18 @@ async function submit(event: FormSubmitEvent<Schema>) {
 
 async function update(event: FormSubmitEvent<Schema>) {
     try {
-        console.log(event.data)
         if (!event.data.chatName) {
             toast.warning('Group name cannot be empty!');
             return;
         }
-        const chatRef = dbRef(database, `chat/${chatId}`);
 
-        await set(chatRef, { chatName: event.data.chatName });
+        const chatRef = dbRef(database, `chat/${chatId}`);
+        const existingDataSnapshot = await get(chatRef);
+        const existingData = existingDataSnapshot.val() || {};
+
+        existingData.chatName = event.data.chatName;
+
+        await set(chatRef, existingData);
 
         toast.success('Group name updated successfully!');
         loadData();

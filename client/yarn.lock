@@ -1000,6 +1000,11 @@
     "semver" "^7.3.5"
     "tar" "^6.1.11"
 
+"@mdi/js@^7.4.47":
+  "integrity" "sha512-KPnNOtm5i2pMabqZxpUz7iQf+mfrYZyKCZ8QNz85czgEt7cuHcGorWfdzUMWYA0SD+a6Hn4FmJ+YhzzzjkTZrQ=="
+  "resolved" "https://registry.npmjs.org/@mdi/js/-/js-7.4.47.tgz"
+  "version" "7.4.47"
+
 "@netlify/functions@^2.3.0":
   "integrity" "sha512-E3kzXPWMP/r1rAWhjTaXcaOT47dhEvg/eQUJjRLhD9Zzp0WqkdynHr+bqff4rFNv6tuXrtFZrpbPJFKHH0c0zw=="
   "resolved" "https://registry.npmjs.org/@netlify/functions/-/functions-2.3.0.tgz"

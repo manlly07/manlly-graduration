@@ -32,7 +32,14 @@
                     </div>
                 </div>
             </div>
-            <div class="w-2/3">
+            <div class="w-2/3 flex-container">
+                <div className="welcome_container">
+                    <img src="../../../assets/images/heart.gif" />
+                    <h1>
+                        WELCOME
+                    </h1>
+                    <h3>Please select a chat to Start messaging.</h3>
+                </div>
             </div>
         </div>
         <UModal v-model="isOpen" prevent-close>
@@ -170,3 +177,26 @@ function formatTime(isoString) {
     return new Date(isoString).toLocaleString(undefined, options);
 }
 </script>
+
+<style>
+.flex-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    margin: auto;
+}
+
+.welcome_container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: black;
+}
+
+img {
+    height: 10rem;
+}
+</style>

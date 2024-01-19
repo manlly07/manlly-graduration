@@ -1,5 +1,5 @@
 <template>
-    <AdminLayout>
+    <TeacherLayout>
         <div class="header flex gap-4 items-center h-14 border-b px-4">
             <div class="flex-1">
                 <div class="flex gap-4 items-center">
@@ -107,11 +107,11 @@
                 </UCard>
             </UModal>
         </template>
-    </AdminLayout>
+    </TeacherLayout>
 </template>
 
 <script setup lang="ts">
-import AdminLayout from '~/layouts/AdminLayout.vue';
+import TeacherLayout from '../layouts/TeacherLayout.vue';
 import { ref, onMounted, computed } from 'vue';
 import { useToast } from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
@@ -216,14 +216,18 @@ async function submit(event: FormSubmitEvent<Schema>) {
 
 async function update(event: FormSubmitEvent<Schema>) {
     try {
-        console.log(event.data)
         if (!event.data.chatName) {
             toast.warning('Group name cannot be empty!');
             return;
         }
-        const chatRef = dbRef(database, `chat/${chatId}`);
 
-        await set(chatRef, { chatName: event.data.chatName });
+        const chatRef = dbRef(database, `chat/${chatId}`);
+        const existingDataSnapshot = await get(chatRef);
+        const existingData = existingDataSnapshot.val() || {};
+
+        existingData.chatName = event.data.chatName;
+
+        await set(chatRef, existingData);
 
         toast.success('Group name updated successfully!');
         loadData();
@@ -233,6 +237,7 @@ async function update(event: FormSubmitEvent<Schema>) {
         toast.error('Error updating name');
     }
 }
+
 
 function reverseObject(obj) {
     const messageArray = Object.keys(obj).map(key => ({ key, ...obj[key] }));
