@@ -3,6 +3,39 @@ const fs = require('fs')
 const uploadModel = require('../models/Upload');
 const stream = require('stream');
 
+function validateUserData(data) {
+  return data.map((entry) => {
+    const requiredFields = ['email', 'name', 'phoneNumber', 'DOB', 'address', 'Department', 'Majors', 'role'];
+    for (const field of requiredFields) {
+      if (!entry[field]) {
+        throw new Error(`Field '${field}' is required for each entry`);
+      }
+    }
+    return entry;
+  });
+}
+
+function processUserData(data) {
+  return data.map((entry) => {
+    entry.email = entry.email.toLowerCase();
+    entry.role = convertRoleToNumber(entry.role); 
+    return entry;
+  });
+}
+
+function convertRoleToNumber(role) {
+  switch (role.toLowerCase()) {
+    case 'student':
+      return 0;
+    case 'teacher':
+      return 1;
+    case 'admin':
+      return 2;
+    default:
+      throw new Error(`Invalid role: ${role}`);
+  }
+}
+
 class UploadController {
   async uploadFile(req, res) {
     try {
@@ -47,11 +80,20 @@ class UploadController {
       const fileBuffer = req.file.buffer;
       const bufferStream = new stream.PassThrough();
       bufferStream.end(fileBuffer);
-      bufferStream.pipe(csv({}))
+
+      bufferStream
+        .pipe(csv({}))
         .on('data', (data) => result.push(data))
-        .on('end', () => {
-          console.log(result);
-          res.status(200).json({ message: 'File uploaded successfully', data: result });
+        .on('end', async () => {
+          try {
+            const validatedData = validateUserData(result);
+            const processedData = processUserData(validatedData);
+
+            res.status(200).json({ message: 'File uploaded successfully', data: processedData });
+          } catch (error) {
+            console.error(error);
+            res.status(400).json({ error: error.message });
+          }
         });
     } catch (error) {
       console.error(error);
