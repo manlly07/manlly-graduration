@@ -133,15 +133,17 @@ async function loadData() {
 onMounted(loadData);
 
 async function submit(event: FormSubmitEvent<Schema>) {
-  console.log(event.data)
+  console.log(event.data);
   if (!event.data.className || !event.data.teacherId || event.data.listUser.length === 0) {
     toast.error("Please fill in all required fields.");
   } else {
     try {
-      const response = await axios.post('http://localhost:5000/api/class', event.data, { headers });
+      const updatedListUser = [...event.data.listUser, event.data.teacherId];
+
+      const response = await axios.post('http://localhost:5000/api/class', { ...event.data, listUser: updatedListUser }, { headers });
       const newChat = {
         chatName: event.data.className,
-        listUser: event.data.listUser,
+        listUser: updatedListUser,
         listMessage: []
       };
       await push(dbRef(database, "chat"), newChat);
@@ -158,6 +160,6 @@ async function submit(event: FormSubmitEvent<Schema>) {
       toast.error("An error occurred during form submission.");
     }
   }
-
 }
+
 </script>

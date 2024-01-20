@@ -69,7 +69,7 @@
                     <UButton type="submit"> Submit </UButton>
                 </UForm>
             </UCard>
-        </UModal>
+        </UModal> 
     </AdminLayout>
 </template>
 
@@ -151,11 +151,11 @@ async function submit(event: FormSubmitEvent<Schema>) {
             listUser: selectedUsers,
             listMessage: []
         };
-
+ 
         await push(dbRef(database, "chat"), newChat);
 
         toast.success('Chat created successfully!');
-        isOpen.value = false;
+        isOpen.value = false; 
     } catch (error) {
         console.log(error);
         toast.error('Error creating chat');

@@ -14,8 +14,6 @@
             <div>
                 <Icon name="material-symbols:groups-2" class="mr-4 mt-[2px] text-gray-500" size="25"
                     @click="isOpenView = true" />
-                <Icon name="material-symbols:person-add" class="mr-4 mt-[2px] text-gray-500" size="25"
-                    @click="isOpenAdd = true" />
                 <Icon name="material-symbols:edit" class="mr-4 mt-[2px] text-gray-500" size="25"
                     @click="isOpenUpdate = true" />
             </div>
@@ -54,32 +52,6 @@
                     <div class="flex gap-4" v-for="person in members">
                         <p>{{ person.name + " - " + person.email }}</p>
                     </div>
-                </UCard>
-            </UModal>
-        </template>
-        <template>
-            <UModal v-model="isOpenAdd" prevent-close>
-                <UCard :ui="{
-                    ring: '',
-                    divide: 'divide-y divide-gray-100 dark:divide-gray-800',
-                }">
-                    <template #header>
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white">
-                                Add new member
-                            </h3>
-                            <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" class="-my-1"
-                                @click="isOpenAdd = false" />
-                        </div>
-                    </template>
-                    <UForm :schema="schema" :state="state" @submit="submit">
-                        <UFormGroup class="mb-4 flex-1" label="Add by email" name="listUser">
-                            <Select v-model:value="state.listUser"
-                                :options="filteredUserData.map(user => ({ label: user.email, value: user._id }))"
-                                mode="tags" placeholder="Please select" class="w-100"></Select>
-                        </UFormGroup>
-                        <UButton type="submit"> Submit </UButton>
-                    </UForm>
                 </UCard>
             </UModal>
         </template>
@@ -195,22 +167,6 @@ async function sendMessage() {
         message.value = '';
     } catch (error) {
         console.error('Error sending message:', error);
-    }
-}
-
-async function submit(event: FormSubmitEvent<Schema>) {
-    try {
-        const chatUserRef = dbRef(database, `chat/${chatId}/listUser`);
-        const existingListUserSnapshot = await get(chatUserRef);
-        const existingListUser = existingListUserSnapshot.val() || [];
-        const newListUser = [...existingListUser, ...event.data.listUser];
-        await set(chatUserRef, newListUser);
-        loadData();
-        toast.success('Members added successfully!');
-        isOpenAdd.value = false;
-    } catch (error) {
-        console.error('Error adding members:', error);
-        toast.error('Error adding members');
     }
 }
 
