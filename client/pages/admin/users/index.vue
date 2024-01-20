@@ -230,12 +230,12 @@ async function uploadFile(event: FormSubmitEvent<Schema>) {
     const formData = new FormData();
     formData.append('file', fileList.value[0]?.originFileObj);
     console.log(formData)
-    // const response = await axios.post('http://localhost:5000/api/user/logup', event.data);
+    const response = await axios.post('http://localhost:5000/api/uploadUser', formData);
     // const stateResponse = response.data.status;
     // if (stateResponse) {
     //   isOpen.value = false;
     //   toast.success("Register account successfully.");
-    //   loadData();
+    //   loadData(); 
     // } else {
     //   toast.error(response.data.message);
     // }
