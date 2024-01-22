@@ -2,10 +2,11 @@ const csv = require('csv-parser')
 const fs = require('fs')
 const uploadModel = require('../models/Upload');
 const stream = require('stream');
+const userController = require("../controllers/userController")
 
 function validateUserData(data) {
   return data.map((entry) => {
-    const requiredFields = ['email', 'name', 'phoneNumber', 'DOB', 'address', 'Department', 'Majors', 'role'];
+    const requiredFields = ['name', 'phoneNumber', 'DOB', 'address', 'Department', 'Majors', 'role'];
     for (const field of requiredFields) {
       if (!entry[field]) {
         throw new Error(`Field '${field}' is required for each entry`);
@@ -17,23 +18,27 @@ function validateUserData(data) {
 
 function processUserData(data) {
   return data.map((entry) => {
+    entry = convertKeysToLowercase(entry);
     entry.email = entry.email.toLowerCase();
-    entry.role = convertRoleToNumber(entry.role); 
+    entry.role = convertRoleToNumber(entry.role);
+
+    const cleanedName = entry.name.replace(/\s/g, '');
+    entry.password = `${cleanedName}_${entry.phoneNumber}`;
+
     return entry;
   });
 }
 
-function convertRoleToNumber(role) {
-  switch (role.toLowerCase()) {
-    case 'student':
-      return 0;
-    case 'teacher':
-      return 1;
-    case 'admin':
-      return 2;
-    default:
-      throw new Error(`Invalid role: ${role}`);
-  }
+function convertKeysToLowercase(obj) {
+  const result = {};
+  for (const key in obj) {
+    if (typeof obj[key] === 'string') {
+      result[key.toLowerCase()] = obj[key];
+    } else {
+      result[key] = obj[key];
+    }
+  } 
+  return result;
 }
 
 class UploadController {
@@ -83,13 +88,21 @@ class UploadController {
 
       bufferStream
         .pipe(csv({}))
-        .on('data', (data) => result.push(data))
+        .on('data', (data) => {
+          console.log(data, data['email'])
+          data.email = data['email'];
+          result.push(data);
+        })
         .on('end', async () => {
           try {
+            console.log(result)
             const validatedData = validateUserData(result);
             const processedData = processUserData(validatedData);
-
-            res.status(200).json({ message: 'File uploaded successfully', data: processedData });
+            console.log(processedData)
+            // for (const entry of processedData) {
+            //   await userController.logup({ body: entry }, {});
+            // }
+            res.status(200).json({ status: 0, data: processedData });
           } catch (error) {
             console.error(error);
             res.status(400).json({ error: error.message });

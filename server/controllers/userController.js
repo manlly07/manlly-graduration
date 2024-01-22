@@ -45,7 +45,7 @@ module.exports = {
         try {
             let {
                 email,
-                password,
+                password, 
                 name,
                 phoneNumber,
                 DOB,
@@ -71,13 +71,12 @@ module.exports = {
                     message: "Email đã được sử dụng"
                 });
             }
-
-            const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+            const hashedPassword = await bcrypt.hash(password, 10);
             if (role == 'Admin') {
                 role = 2;
             } else if (role == 'Teacher') {
                 role = 1;
-            } else {
+            } else if (role == 'Student') {
                 role = 0;
             }
             const newUser = new User({
